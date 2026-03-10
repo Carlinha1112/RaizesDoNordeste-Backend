@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from infrastructure.database.database import Base
+from src.infrastructure.database.database import Base
 
 class Unidade(Base):
     __tablename__ = "unidade"

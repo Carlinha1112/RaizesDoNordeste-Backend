@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date, Boolean, DateTime, Enum
-from infrastructure.database.database import Base
+from src.infrastructure.database.database import Base
 from datetime import datetime, timezone 
 import enum
 from passlib.context import CryptContext

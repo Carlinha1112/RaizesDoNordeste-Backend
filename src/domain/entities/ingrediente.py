@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from infrastructure.database.database import Base
+from src.infrastructure.database.database import Base
 
 class Ingrediente(Base):
     __tablename__ = "ingrediente"
