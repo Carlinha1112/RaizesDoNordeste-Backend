@@ -27,5 +27,5 @@ class Usuario(Base):
    
     def hash_password(self, senha: str) -> str:
         return pwd_context.hash(senha)
-    def verify_password(self, senha: str) -> bool:
+    def verify_password(self, senha: str) -> bool:  
         return pwd_context.verify(senha, self.senha_hash)

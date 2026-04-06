@@ -4,11 +4,14 @@ from src.infrastructure.database.database import Base
 
 
 class ItemPedido(Base):
+
     __tablename__ = "item_pedido"
 
-    id = Column(Integer, primary_key=True, index=True)  
-    id_pedido = Column(Integer, ForeignKey("pedido.id"), primary_key=True)
-    id_produto = Column(Integer, ForeignKey("produto.id"), primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
+
+    id_pedido = Column(Integer, ForeignKey("pedido.id"), nullable=False)
+    id_produto = Column(Integer, ForeignKey("produto.id"), nullable=False)
+
     quantidade = Column(Integer, nullable=False)
     preco_unitario = Column(Numeric(10, 2), nullable=False)
 
