@@ -31,7 +31,6 @@ class PagamentoService:
             if pedido.status_pagamento != StatusPagamento.AGUARDANDO_PAGAMENTO:
                 raise Exception("Pedido não está aguardando pagamento")
 
-            # 🔁 MOCK pagamento
             if metodo == Metodo.PIX:
                 aprovado = True
             else:
@@ -49,10 +48,8 @@ class PagamentoService:
             pagamento_salvo = self.pagamento_repository.criar(db, pagamento)
 
             if aprovado:
-                # ✅ atualizar status
                 pedido.status_pagamento = StatusPagamento.PAGO
 
-                # ✅ baixar estoque (AGORA SIM)
                 itens = pedido.itens
 
                 for item in itens:
@@ -67,13 +64,11 @@ class PagamentoService:
                             db, ing.ingrediente_id, quantidade
                         )
 
-                # ✅ gerar pontos
                 self.fidelidade_service.adicionar_pontos(
                     db, pedido.id_usuario, pedido.valor_total
                 )
 
             else:
-                # ❗ mantém aguardando pagamento
                 pedido.status_pagamento = StatusPagamento.AGUARDANDO_PAGAMENTO
 
             db.commit()

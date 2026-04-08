@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from src.domain.entities.cardapio import Cardapio
 from datetime import date
+from sqlalchemy import or_
 
 
 class CardapioRepository:
@@ -23,10 +24,13 @@ class CardapioRepository:
             .filter(
                 Cardapio.id_unidade == unidade_id,
                 Cardapio.data_inicio <= data,
-                Cardapio.data_fim >= data
+                or_(
+                    Cardapio.data_fim == None,
+                    Cardapio.data_fim >= data
+                )
             )
-            .first()
-        )
+        .first()
+    )
     
     def listar(self, db: Session):
         return db.query(Cardapio).all()

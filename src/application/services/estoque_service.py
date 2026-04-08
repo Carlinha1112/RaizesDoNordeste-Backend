@@ -1,26 +1,46 @@
 from sqlalchemy.orm import Session
-from src.infrastructure.repositories.pedido_repository import PedidoRepository
-from src.infrastructure.repositories.produto_repository import ProdutoRepository
-from src.domain.entities.produto import Produto
-
-class ProdutoService:
-
-    def __init__(self):
-        self.repository = ProdutoRepository()
-        self.pedido_repository = PedidoRepository()
+from src.infrastructure.repositories.estoque_repository import EstoqueRepository
 
 
-    def criar_produto(self, db: Session, produto: Produto):
-        return self.repository.criar(db, produto)
+class EstoqueService:
+    def __init__(self, estoque_repository: EstoqueRepository):
+        self.estoque_repository = estoque_repository
 
+    def verificar_estoque(
+        self,
+        db: Session,
+        ingrediente_id: int,
+        quantidade_necessaria: float
+    ) -> bool:
+        return self.estoque_repository.tem_estoque(
+            db,
+            ingrediente_id,
+            quantidade_necessaria
+        )
 
-    def buscar_produto(self, db: Session, produto_id: int):
-        return self.repository.buscar_por_id(db, produto_id)
+    def debitar_estoque(
+        self,
+        db: Session,
+        ingrediente_id: int,
+        quantidade: float
+    ):
+        if not self.estoque_repository.tem_estoque(db, ingrediente_id, quantidade):
+            raise Exception("Estoque insuficiente")
 
+        return self.estoque_repository.debitar_estoque(
+            db,
+            ingrediente_id,
+            quantidade
+        )
 
-    def listar_produtos(self, db: Session):
-        return self.repository.listar(db)
-    
-    
-    def listar_produtos_por_unidade(self, db: Session, unidade_id: int):
-        return self.repository.buscar_por_unidade(db, unidade_id)
+    def repor_estoque(
+        self,
+        db: Session,
+        ingrediente_id: int,
+        quantidade: float
+    ):
+        return self.estoque_repository.repor_estoque(
+            db,
+            ingrediente_id,
+            quantidade
+        )

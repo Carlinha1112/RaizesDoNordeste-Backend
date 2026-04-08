@@ -35,16 +35,14 @@ class PedidoService:
         pedido_data: PedidoCreate,
         itens: List[ItemPedidoCreate],
         pontos_utilizados: int,
-        usuario_id: int   # 🔥 vem do JWT
+        usuario_id: int  
     ):
         try:
-            # ❗ E01 - Pedido vazio
             if not itens:
                 raise Exception("Pedido não pode ser vazio")
 
             hoje = date.today()
 
-            # 1️⃣ buscar cardápio ativo
             cardapio = self.cardapio_repository.buscar_cardapio_ativo(
                 db, pedido_data.id_unidade, hoje
             )
@@ -53,7 +51,6 @@ class PedidoService:
 
             valor_total = 0
 
-            # 2️⃣ validar disponibilidade + estoque (ingredientes)
             for item in itens:
                 cardapio_produto = self.cardapio_produto_repository.buscar(
                     db, cardapio.id, item.produto_id
@@ -78,7 +75,6 @@ class PedidoService:
 
                 valor_total += cardapio_produto.preco_venda * item.quantidade
 
-            # 3️⃣ aplicar fidelidade (desconto)
             desconto = 0
             if pontos_utilizados > 0:
                 desconto = self.fidelidade_service.calcular_desconto(
@@ -86,16 +82,14 @@ class PedidoService:
                     pontos_utilizados
                 )
 
-                # ❗ RN01 - máximo 70%
                 if desconto > valor_total * 0.7:
                     raise Exception("Desconto excede 70% do valor do pedido")
 
             valor_final = valor_total - desconto
 
-            # 4️⃣ criar pedido
             pedido = Pedido(
                 id_unidade=pedido_data.id_unidade,
-                id_usuario=usuario_id,   # 🔥 vem do token
+                id_usuario=usuario_id, 
                 canal_pedido=pedido_data.canal_pedido,
                 status_pagamento=StatusPagamento.AGUARDANDO_PAGAMENTO,
                 valor_total=valor_final
@@ -103,7 +97,6 @@ class PedidoService:
 
             pedido_salvo = self.pedido_repository.criar(db, pedido)
 
-            # 5️⃣ criar itens
             for item in itens:
                 cardapio_produto = self.cardapio_produto_repository.buscar(
                     db, cardapio.id, item.produto_id
@@ -118,7 +111,6 @@ class PedidoService:
 
                 self.item_repository.criar(db, item_entity)
 
-            # 6️⃣ debitar pontos (se usou)
             if pontos_utilizados > 0:
                 self.fidelidade_service.debitar_pontos(
                     db,

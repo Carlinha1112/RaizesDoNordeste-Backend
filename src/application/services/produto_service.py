@@ -24,13 +24,11 @@ class ProdutoService:
 
     def criar_produto(self, db: Session, produto_data: ProdutoCreate):
         try:
-            # 1️⃣ criar produto
             produto = Produto(
                 nome=produto_data.nome,
                 descricao=produto_data.descricao
             )
             produto_salvo = self.produto_repository.criar(db, produto)
-            # 2️⃣ validar e criar ingredientes
             for item in produto_data.ingredientes:
 
                 ingrediente = self.ingrediente_repository.buscar_por_id(
@@ -53,20 +51,20 @@ class ProdutoService:
 
 
     def buscar_produto(self, db: Session, produto_id: int):
-        return self.repository.buscar_por_id(db, produto_id)
+        return self.produto_repository.buscar_por_id(db, produto_id)
 
 
     def listar_produtos(self, db: Session):
-        return self.repository.listar(db)
+        return self.produto_repository.listar(db)
 
 
     def listar_produtos_ativos(self, db: Session):
-        return self.repository.listar_ativos(db)
+        return self.produto_repository.listar_ativos(db)
 
 
     def desativar_produto(self, db: Session, produto_id: int):
-        produto = self.repository.buscar_por_id(db, produto_id)
+        produto = self.produto_repository.buscar_por_id(db, produto_id)
         if not produto:
             raise Exception("Produto não encontrado")
 
-        return self.repository.desativar(db, produto)
+        return self.produto_repository.desativar(db, produto)

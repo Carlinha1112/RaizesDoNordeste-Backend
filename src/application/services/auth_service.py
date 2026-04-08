@@ -17,7 +17,7 @@ class AuthService:
     def autenticar_usuario(self, db: Session, email: str, senha: str):
         usuario = self.usuario_repository.buscar_por_email(db, email)
 
-        if not usuario or usuario.senha != senha:
+        if not usuario or not usuario.verify_password(senha):
             return None
 
         return usuario
