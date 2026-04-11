@@ -4,7 +4,7 @@ from src.infrastructure.database.database import Base
 from datetime import datetime, timezone
 import enum
 
-class Status(enum.Enum):
+class StatusPedido(enum.Enum):
     AGUARDANDO_PAGAMENTO = "AGUARDANDO PAGAMENTO"
     PAGO = "PAGO"
     EM_PREPARO = "EM PREPARO"
@@ -17,7 +17,7 @@ class HistoricoStatusPedido(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_pedido = Column(Integer, ForeignKey("pedido.id"), nullable=False)
-    status = Column(Enum(Status), nullable=False)
+    status = Column(Enum(StatusPedido), nullable=False)
     data_hora = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     pedido = relationship("Pedido")

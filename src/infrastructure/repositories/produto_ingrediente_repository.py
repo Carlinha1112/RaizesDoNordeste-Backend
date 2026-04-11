@@ -26,7 +26,8 @@ class ProdutoIngredienteRepository:
     def remover_por_produto(self, db: Session, produto_id: int):
         db.query(ProdutoIngrediente).filter(
             ProdutoIngrediente.id_produto == produto_id
-        ).delete()
+        ).delete(synchronize_session=False)
+        db.flush()
 
 
     def atualizar_quantidade(

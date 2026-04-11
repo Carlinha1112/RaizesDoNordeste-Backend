@@ -28,14 +28,13 @@ class PedidoService:
         self.cardapio_repository = cardapio_repository
         self.cardapio_produto_repository = cardapio_produto_repository
 
-
     def criar_pedido(
         self,
         db: Session,
         pedido_data: PedidoCreate,
         itens: List[ItemPedidoCreate],
         pontos_utilizados: int,
-        usuario_id: int  
+        usuario_id: int
     ):
         try:
             if not itens:
@@ -46,6 +45,7 @@ class PedidoService:
             cardapio = self.cardapio_repository.buscar_cardapio_ativo(
                 db, pedido_data.id_unidade, hoje
             )
+
             if not cardapio:
                 raise Exception("Não existe cardápio ativo")
 
@@ -59,23 +59,28 @@ class PedidoService:
                 if not cardapio_produto or not cardapio_produto.ativo_no_cardapio:
                     raise Exception(f"Produto {item.produto_id} indisponível")
 
-                ingredientes = self.produto_ingrediente_repository.buscar_por_produto(
+                ingredientes = self.produto_ingrediente_repository.listar_por_produto(
                     db, item.produto_id
                 )
 
                 for ing in ingredientes:
-                    quantidade_necessaria = ing.quantidade * item.quantidade
+                    quantidade_necessaria = (
+                        ing.quantidade_necessaria * item.quantidade
+                    )
 
                     if not self.estoque_repository.tem_estoque(
-                        db, ing.ingrediente_id, quantidade_necessaria
+                        db,
+                        ing.id_ingrediente,
+                        quantidade_necessaria
                     ):
                         raise Exception(
-                            f"Estoque insuficiente para ingrediente {ing.ingrediente_id}"
+                            f"Estoque insuficiente para ingrediente {ing.id_ingrediente}"
                         )
 
                 valor_total += cardapio_produto.preco_venda * item.quantidade
 
             desconto = 0
+
             if pontos_utilizados > 0:
                 desconto = self.fidelidade_service.calcular_desconto(
                     valor_total,
@@ -89,7 +94,7 @@ class PedidoService:
 
             pedido = Pedido(
                 id_unidade=pedido_data.id_unidade,
-                id_usuario=usuario_id, 
+                id_usuario=usuario_id,
                 canal_pedido=pedido_data.canal_pedido,
                 status_pagamento=StatusPagamento.AGUARDANDO_PAGAMENTO,
                 valor_total=valor_final
@@ -124,3 +129,34 @@ class PedidoService:
         except Exception:
             db.rollback()
             raise
+
+    def buscar_pedido(self, db: Session, pedido_id: int):
+        pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
+
+        if not pedido:
+            raise Exception("Pedido não encontrado")
+
+        return pedido
+
+    def listar_pedidos_por_usuario(self, db: Session, usuario_id: int):
+        return self.pedido_repository.listar_por_usuario(db, usuario_id)
+
+    def cancelar_pedido(self, db: Session, pedido_id: int, usuario_id: int):
+        pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
+
+        if not pedido:
+            raise Exception("Pedido não encontrado")
+
+        if pedido.id_usuario != usuario_id:
+            raise Exception("Acesso negado")
+
+        if pedido.status_pagamento == StatusPagamento.CANCELADO:
+            raise Exception("Pedido já está cancelado")
+
+        if pedido.status_pagamento == StatusPagamento.PAGO:
+            raise Exception("Não é possível cancelar um pedido já pago")
+
+        pedido.status_pagamento = StatusPagamento.CANCELADO
+
+        db.commit()
+        return pedido

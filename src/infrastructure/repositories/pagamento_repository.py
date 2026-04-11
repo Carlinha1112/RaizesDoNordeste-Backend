@@ -13,5 +13,5 @@ class PagamentoRepository:
     def buscar_por_id(self, db: Session, pagamento_id: int):
         return db.query(Pagamento).filter(Pagamento.id == pagamento_id).first()
 
-    def buscar_por_id_pedido(self, db: Session, pedido_id: int):
+    def buscar_por_pedido(self, db: Session, pedido_id: int):
         return db.query(Pagamento).filter(Pagamento.pedido_id == pedido_id).first()

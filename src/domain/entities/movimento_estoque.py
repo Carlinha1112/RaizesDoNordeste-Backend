@@ -15,7 +15,7 @@ class MotivoMovimento(enum.Enum):
     REPOSICAO = "REPOSICAO"
 
 class MovimentoEstoque(Base):
-    __tablename__ = "movimento_estoque "
+    __tablename__ = "movimento_estoque"
 
     id = Column(Integer, primary_key=True, index=True)
     id_estoque = Column(Integer, ForeignKey("estoque.id"), nullable=False)

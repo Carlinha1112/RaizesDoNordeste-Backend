@@ -53,15 +53,15 @@ class PagamentoService:
                 itens = pedido.itens
 
                 for item in itens:
-                    ingredientes = self.produto_ingrediente_repository.buscar_por_produto(
+                    ingredientes = self.produto_ingrediente_repository.listar_por_produto(
                         db, item.id_produto
                     )
 
                     for ing in ingredientes:
-                        quantidade = ing.quantidade * item.quantidade
+                        quantidade = ing.quantidade_necessaria * item.quantidade
 
                         self.estoque_repository.debitar_estoque(
-                            db, ing.ingrediente_id, quantidade
+                            db, ing.id_ingrediente, quantidade
                         )
 
                 self.fidelidade_service.adicionar_pontos(

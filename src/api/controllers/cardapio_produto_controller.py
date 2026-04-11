@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
 
 from src.infrastructure.database.database import get_db
 from src.infrastructure.repositories.cardapio_produto_repository import CardapioProdutoRepository
@@ -11,11 +12,10 @@ from src.api.schemas.cardapio_produto_schema import (
     CardapioProdutoResponse
 )
 
-
 router = APIRouter(prefix="/cardapios", tags=["Cardápio Produtos"])
 
 
-def get_service():
+def get_cardapio_produto_service():
     return CardapioProdutoService(CardapioProdutoRepository())
 
 
@@ -23,18 +23,18 @@ def get_service():
 def adicionar_produto(
     cardapio_id: int,
     dados: CardapioProdutoCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    service: CardapioProdutoService = Depends(get_cardapio_produto_service)
 ):
-    service = get_service()
     return service.adicionar_produto(db, cardapio_id, dados)
 
 
-@router.get("/{cardapio_id}/produtos", response_model=list[CardapioProdutoResponse])
+@router.get("/{cardapio_id}/produtos", response_model=List[CardapioProdutoResponse])
 def listar_produtos(
     cardapio_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    service: CardapioProdutoService = Depends(get_cardapio_produto_service)
 ):
-    service = get_service()
     return service.listar_produtos(db, cardapio_id)
 
 
@@ -43,7 +43,7 @@ def atualizar_produto(
     cardapio_id: int,
     produto_id: int,
     dados: CardapioProdutoUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    service: CardapioProdutoService = Depends(get_cardapio_produto_service)
 ):
-    service = get_service()
     return service.atualizar_produto(db, cardapio_id, produto_id, dados)

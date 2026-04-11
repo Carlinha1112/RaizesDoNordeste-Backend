@@ -79,4 +79,4 @@ def cancelar_pedido(
     usuario = Depends(get_current_user),
     service: PedidoService = Depends(get_pedido_service)
 ):
-    return service.cancelar_pedido(db, pedido_id)
+    return service.cancelar_pedido(db, pedido_id, usuario.id)

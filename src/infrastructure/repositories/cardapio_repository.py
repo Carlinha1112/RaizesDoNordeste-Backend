@@ -34,3 +34,12 @@ class CardapioRepository:
     
     def listar(self, db: Session):
         return db.query(Cardapio).all()
+    
+    def listar_ativos(self, db: Session, data: date):
+        return db.query(Cardapio).filter(
+            Cardapio.data_inicio <= data,
+            or_(
+                Cardapio.data_fim == None,
+                Cardapio.data_fim >= data
+            )
+        ).all()

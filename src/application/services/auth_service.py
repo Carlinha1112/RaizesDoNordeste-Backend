@@ -22,7 +22,7 @@ class AuthService:
 
         return usuario
 
-    def criar_token(self, usuario_id: int):
+    def gerar_token(self, usuario_id: int):
         expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
         payload = {

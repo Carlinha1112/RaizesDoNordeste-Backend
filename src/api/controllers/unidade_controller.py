@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
 
 from src.infrastructure.database.database import get_db
 from src.infrastructure.repositories.unidade_repository import UnidadeRepository
@@ -13,7 +14,6 @@ def get_unidade_service():
     return UnidadeService(UnidadeRepository())
 
 
-
 @router.post("/", response_model=UnidadeResponse)
 def criar_unidade(
     unidade: UnidadeCreate,
@@ -23,7 +23,7 @@ def criar_unidade(
     return service.criar_unidade(db, unidade)
 
 
-@router.get("/", response_model=list[UnidadeResponse])
+@router.get("/", response_model=List[UnidadeResponse])
 def listar_unidades(
     db: Session = Depends(get_db),
     service: UnidadeService = Depends(get_unidade_service)
@@ -31,7 +31,7 @@ def listar_unidades(
     return service.listar_unidades(db)
 
 
-@router.get("/ativas", response_model=list[UnidadeResponse])
+@router.get("/ativas", response_model=List[UnidadeResponse])
 def listar_unidades_ativas(
     db: Session = Depends(get_db),
     service: UnidadeService = Depends(get_unidade_service)
