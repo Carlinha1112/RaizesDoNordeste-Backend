@@ -26,5 +26,8 @@ def login(
     if not usuario:
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
-    token = service.criar_token(usuario.id)
-    return {"access_token": token}
+    token = service.gerar_token(usuario.id)
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }

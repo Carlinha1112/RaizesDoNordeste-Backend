@@ -6,6 +6,8 @@ from src.infrastructure.database.database import get_db
 from src.infrastructure.repositories.cardapio_repository import CardapioRepository
 from src.application.services.cardapio_service import CardapioService
 from src.api.schemas.cardapio_schema import CardapioCreate, CardapioResponse
+from src.api.dependencies.role_dependency import require_role
+from src.domain.entities.usuario import PerfilUsuario
 
 router = APIRouter(prefix="/cardapios", tags=["Cardápios"])
 
@@ -18,6 +20,7 @@ def get_cardapio_service():
 def criar_cardapio(
     cardapio: CardapioCreate,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE)),
     service: CardapioService = Depends(get_cardapio_service)
 ):
     return service.criar_cardapio(db, cardapio)

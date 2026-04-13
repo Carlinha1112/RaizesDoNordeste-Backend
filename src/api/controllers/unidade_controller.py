@@ -6,6 +6,8 @@ from src.infrastructure.database.database import get_db
 from src.infrastructure.repositories.unidade_repository import UnidadeRepository
 from src.application.services.unidade_service import UnidadeService
 from src.api.schemas.unidade_schema import UnidadeCreate, UnidadeResponse
+from src.api.dependencies.role_dependency import require_role
+from src.domain.entities.usuario import PerfilUsuario
 
 router = APIRouter(prefix="/unidades", tags=["Unidades"])
 
@@ -18,6 +20,7 @@ def get_unidade_service():
 def criar_unidade(
     unidade: UnidadeCreate,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE)),
     service: UnidadeService = Depends(get_unidade_service)
 ):
     return service.criar_unidade(db, unidade)
@@ -52,6 +55,7 @@ def buscar_unidade(
 def desativar_unidade(
     unidade_id: int,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE)),
     service: UnidadeService = Depends(get_unidade_service)
 ):
     return service.desativar_unidade(db, unidade_id)

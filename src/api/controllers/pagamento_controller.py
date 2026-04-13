@@ -11,6 +11,8 @@ from src.infrastructure.repositories.estoque_repository import EstoqueRepository
 from src.infrastructure.repositories.fidelidade_repository import FidelidadeRepository
 from src.infrastructure.repositories.historico_fidelidade_repository import HistoricoFidelidadeRepository
 from src.domain.entities.pagamento import Metodo
+from src.api.dependencies.role_dependency import require_role
+from src.domain.entities.usuario import PerfilUsuario
 
 router = APIRouter(prefix="/pagamentos", tags=["Pagamentos"])
 
@@ -33,6 +35,10 @@ def pagar_pedido(
     pedido_id: int,
     metodo: Metodo,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(
+        PerfilUsuario.CLIENTE,
+        PerfilUsuario.ATENDENTE
+    )),
     service: PagamentoService = Depends(get_service)
 ):
-    return service.processar_pagamento(db, pedido_id, metodo)
+    return service.processar_pagamento(db, pedido_id, metodo, usuario)

@@ -6,6 +6,8 @@ from src.domain.entities.pedido import Pedido, StatusPagamento
 from src.domain.entities.item_pedido import ItemPedido
 
 from src.api.schemas.pedido_schema import PedidoCreate, ItemPedidoCreate
+from src.domain.entities.usuario import PerfilUsuario
+
 
 
 class PedidoService:
@@ -31,11 +33,12 @@ class PedidoService:
     def criar_pedido(
         self,
         db: Session,
-        pedido_data: PedidoCreate,
-        itens: List[ItemPedidoCreate],
-        pontos_utilizados: int,
-        usuario_id: int
+        pedido_data,
+        itens,
+        pontos_utilizados,
+        usuario
     ):
+        usuario_id = usuario.id
         try:
             if not itens:
                 raise Exception("Pedido não pode ser vazio")
@@ -130,28 +133,47 @@ class PedidoService:
             db.rollback()
             raise
 
-    def buscar_pedido(self, db: Session, pedido_id: int):
+    def buscar_pedido(self, db: Session, pedido_id: int, usuario):
         pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
 
         if not pedido:
             raise Exception("Pedido não encontrado")
+
+        if usuario.perfil == PerfilUsuario.CLIENTE:
+            if pedido.id_usuario != usuario.id:
+                raise Exception("Acesso negado")
+
+        if usuario.perfil == PerfilUsuario.ATENDENTE:
+            if pedido.id_unidade != usuario.id_unidade:
+                raise Exception("Acesso negado")
 
         return pedido
 
-    def listar_pedidos_por_usuario(self, db: Session, usuario_id: int):
-        return self.pedido_repository.listar_por_usuario(db, usuario_id)
+    def listar_pedidos(self, db: Session, usuario):
 
-    def cancelar_pedido(self, db: Session, pedido_id: int, usuario_id: int):
+        if usuario.perfil == PerfilUsuario.CLIENTE:
+            return self.pedido_repository.listar_por_usuario(db, usuario.id)
+
+        if usuario.perfil == PerfilUsuario.ATENDENTE:
+            return self.pedido_repository.listar_por_unidade(db, usuario.id_unidade)
+
+        if usuario.perfil == PerfilUsuario.GERENTE:
+            return self.pedido_repository.listar(db)
+
+    def cancelar_pedido(self, db: Session, pedido_id: int, usuario):
+
         pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
 
         if not pedido:
             raise Exception("Pedido não encontrado")
+        
+        if usuario.perfil == PerfilUsuario.ATENDENTE:
+            if pedido.id_unidade != usuario.id_unidade:
+                raise Exception("Você não pode acessar pedidos de outra unidade")
 
-        if pedido.id_usuario != usuario_id:
-            raise Exception("Acesso negado")
-
-        if pedido.status_pagamento == StatusPagamento.CANCELADO:
-            raise Exception("Pedido já está cancelado")
+        if usuario.perfil == PerfilUsuario.CLIENTE:
+            if pedido.id_usuario != usuario.id:
+                raise Exception("Você não pode cancelar este pedido")
 
         if pedido.status_pagamento == StatusPagamento.PAGO:
             raise Exception("Não é possível cancelar um pedido já pago")

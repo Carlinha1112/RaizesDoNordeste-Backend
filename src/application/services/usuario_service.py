@@ -2,7 +2,10 @@ from sqlalchemy.orm import Session
 from src.infrastructure.repositories.usuario_repository import UsuarioRepository
 from src.domain.entities.usuario import Usuario
 from src.api.schemas.usuario_schema import UsuarioCreate
+from src.domain.entities.usuario import PerfilUsuario
+from passlib.context import CryptContext
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class UsuarioService:
 
@@ -10,19 +13,25 @@ class UsuarioService:
         self.repository = repository
 
 
-    def criar_usuario(self, db: Session, usuario_data: UsuarioCreate):
-        existente = self.repository.buscar_por_email(db, usuario_data.email)
-        if existente:
-            raise Exception("Email já cadastrado")
-        usuario = Usuario(
-            nome=usuario_data.nome,
-            data_nasc=usuario_data.data_nasc,
-            email=usuario_data.email,
-            telefone=usuario_data.telefone,
-            perfil=usuario_data.perfil
+    def criar_usuario(self, db: Session, usuario: UsuarioCreate):
+
+        if usuario.perfil == PerfilUsuario.ATENDENTE and not usuario.id_unidade:
+            raise Exception("Atendente deve estar vinculado a uma unidade")
+
+        usuario_entity = Usuario(
+            nome=usuario.nome,
+            email=usuario.email,
+            senha_hash="",  
+            perfil=usuario.perfil,
+            id_unidade=usuario.id_unidade
         )
-        usuario.senha_hash = usuario.hash_password(usuario_data.senha)
-        return self.repository.criar(db, usuario)
+
+        usuario_entity.senha_hash = usuario_entity.hash_password(usuario.senha)
+
+        usuario_salvo = self.repository.criar(db, usuario_entity)
+
+        db.commit()
+        return usuario_salvo
 
 
     def buscar_usuario(self, db: Session, usuario_id: int):
@@ -37,13 +46,7 @@ class UsuarioService:
         usuario = self.repository.buscar_por_id(db, usuario_id)
         if not usuario:
             raise Exception("Usuário não encontrado")
-        return self.repository.desativar(db, usuario)
-
-
-    def autenticar_usuario(self, db: Session, email: str, senha: str):
-        usuario = self.repository.buscar_por_email(db, email)
-        if not usuario:
-            raise Exception("Usuário não encontrado")
-        if not usuario.verify_password(senha):
-            raise Exception("Senha inválida")
+        self.repository.desativar(db, usuario)
+        db.commit()
         return usuario
+

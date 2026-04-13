@@ -14,6 +14,8 @@ from src.infrastructure.repositories.fidelidade_repository import FidelidadeRepo
 from src.infrastructure.repositories.historico_fidelidade_repository import HistoricoFidelidadeRepository
 from src.api.schemas.pedido_schema import PedidoCreate, PedidoResponse
 from src.api.dependencies.auth_dependency import get_current_user
+from src.api.dependencies.role_dependency import require_role
+from src.domain.entities.usuario import PerfilUsuario
 
 router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
@@ -41,7 +43,10 @@ def get_pedido_service():
 def criar_pedido(
     pedido: PedidoCreate,
     db: Session = Depends(get_db),
-    usuario = Depends(get_current_user),
+    usuario = Depends(require_role(
+        PerfilUsuario.CLIENTE,
+        PerfilUsuario.ATENDENTE
+    )),
     service: PedidoService = Depends(get_pedido_service)
 ):
     return service.criar_pedido(
@@ -49,8 +54,9 @@ def criar_pedido(
         pedido_data=pedido,
         itens=pedido.itens,
         pontos_utilizados=pedido.pontos_utilizados,
-        usuario_id=usuario.id
+        usuario=usuario
     )
+
 
 
 @router.get("/{pedido_id}", response_model=PedidoResponse)
@@ -60,23 +66,27 @@ def buscar_pedido(
     usuario = Depends(get_current_user),
     service: PedidoService = Depends(get_pedido_service)
 ):
-    return service.buscar_pedido(db, pedido_id)
+    return service.buscar_pedido(db, pedido_id, usuario)
 
 
-@router.get("/meus", response_model=list[PedidoResponse])
-def listar_meus_pedidos(
+@router.get("/", response_model=list[PedidoResponse])
+def listar_pedidos(
     db: Session = Depends(get_db),
     usuario = Depends(get_current_user),
     service: PedidoService = Depends(get_pedido_service)
 ):
-    return service.listar_pedidos_por_usuario(db, usuario.id)
+    return service.listar_pedidos(db, usuario)
 
 
 @router.delete("/{pedido_id}")
 def cancelar_pedido(
     pedido_id: int,
     db: Session = Depends(get_db),
-    usuario = Depends(get_current_user),
+    usuario = Depends(require_role(
+        PerfilUsuario.CLIENTE,
+        PerfilUsuario.ATENDENTE,
+        PerfilUsuario.GERENTE
+    )),
     service: PedidoService = Depends(get_pedido_service)
 ):
-    return service.cancelar_pedido(db, pedido_id, usuario.id)
+    return service.cancelar_pedido(db, pedido_id, usuario)

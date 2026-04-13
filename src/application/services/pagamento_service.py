@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from src.domain.entities.pagamento import Pagamento, Status, Metodo
 from src.domain.entities.pedido import StatusPagamento
+from src.domain.entities.usuario import PerfilUsuario
 
 
 class PagamentoService:
@@ -21,7 +22,7 @@ class PagamentoService:
         self.estoque_repository = estoque_repository
         self.fidelidade_service = fidelidade_service
 
-    def processar_pagamento(self, db: Session, pedido_id: int, metodo: Metodo):
+    def processar_pagamento(self, db: Session, pedido_id: int, metodo: Metodo, usuario):
         try:
             pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
 
@@ -30,6 +31,14 @@ class PagamentoService:
 
             if pedido.status_pagamento != StatusPagamento.AGUARDANDO_PAGAMENTO:
                 raise Exception("Pedido não está aguardando pagamento")
+            
+            if usuario.perfil == PerfilUsuario.CLIENTE:
+                if pedido.id_usuario != usuario.id:
+                    raise Exception("Você não pode pagar este pedido")
+            
+            if usuario.perfil == PerfilUsuario.ATENDENTE:
+                if pedido.id_unidade != usuario.id_unidade:
+                    raise Exception("Você não pode pagar pedidos de outra unidade")
 
             if metodo == Metodo.PIX:
                 aprovado = True

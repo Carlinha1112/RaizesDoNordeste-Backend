@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, ForeignKey, Numeric, Boolean, UniqueCons
 from sqlalchemy.orm import relationship
 from src.infrastructure.database.database import Base
 
-
+# Produto que o cliente vê no cardápio, com preço e disponibilidade específicos para aquele cardápio.
 class CardapioProduto(Base):
 
     __tablename__ = "cardapio_produto"

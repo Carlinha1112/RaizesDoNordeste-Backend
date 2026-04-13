@@ -17,6 +17,7 @@ class UsuarioCreate(BaseModel):
     telefone: str
     senha: str
     perfil: PerfilUsuario
+    id_unidade: int | None = None
 
 
 class UsuarioResponse(BaseModel):
