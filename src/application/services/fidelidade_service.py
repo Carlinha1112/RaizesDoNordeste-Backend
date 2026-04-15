@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 
 class FidelidadeService:
 
@@ -31,7 +32,7 @@ class FidelidadeService:
         fidelidade = self.fidelidade_repository.buscar_por_usuario(db, usuario_id)
 
         if not fidelidade:
-            raise Exception("Conta de fidelidade não encontrada")
+            raise HTTPException(status_code=404, detail="Conta de fidelidade não encontrada")
 
         pontos = self.calcular_pontos_por_valor(valor_pedido)
 
@@ -50,10 +51,10 @@ class FidelidadeService:
         fidelidade = self.fidelidade_repository.buscar_por_usuario(db, usuario_id)
 
         if not fidelidade:
-            raise Exception("Conta de fidelidade não encontrada")
+            raise HTTPException(status_code=404, detail="Conta de fidelidade não encontrada")
 
         if fidelidade.saldo_pontos < pontos:
-            raise Exception("Pontos insuficientes")
+            raise HTTPException(status_code=400, detail="Pontos insuficientes")
 
         fidelidade.saldo_pontos -= pontos
 

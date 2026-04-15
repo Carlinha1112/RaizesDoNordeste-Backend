@@ -4,6 +4,7 @@ from src.domain.entities.usuario import Usuario
 from src.api.schemas.usuario_schema import UsuarioCreate
 from src.domain.entities.usuario import PerfilUsuario
 from passlib.context import CryptContext
+from fastapi import HTTPException
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -16,7 +17,7 @@ class UsuarioService:
     def criar_usuario(self, db: Session, usuario: UsuarioCreate):
 
         if usuario.perfil == PerfilUsuario.ATENDENTE and not usuario.id_unidade:
-            raise Exception("Atendente deve estar vinculado a uma unidade")
+            raise HTTPException(status_code=400, detail="Atendente deve estar vinculado a uma unidade")
 
         usuario_entity = Usuario(
             nome=usuario.nome,
@@ -45,7 +46,7 @@ class UsuarioService:
     def desativar_usuario(self, db: Session, usuario_id: int):
         usuario = self.repository.buscar_por_id(db, usuario_id)
         if not usuario:
-            raise Exception("Usuário não encontrado")
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
         self.repository.desativar(db, usuario)
         db.commit()
         return usuario

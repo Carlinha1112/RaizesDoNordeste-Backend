@@ -1,6 +1,8 @@
+import logging
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import date
+from fastapi import HTTPException
 
 from src.domain.entities.pedido import Pedido, StatusPagamento
 from src.domain.entities.item_pedido import ItemPedido
@@ -8,7 +10,7 @@ from src.domain.entities.item_pedido import ItemPedido
 from src.api.schemas.pedido_schema import PedidoCreate, ItemPedidoCreate
 from src.domain.entities.usuario import PerfilUsuario
 
-
+logger = logging.getLogger(__name__)    
 
 class PedidoService:
 
@@ -40,8 +42,12 @@ class PedidoService:
     ):
         usuario_id = usuario.id
         try:
+            
+            logger.info(f"Usuário {usuario_id} iniciando criação de pedido")
+
             if not itens:
-                raise Exception("Pedido não pode ser vazio")
+                logger.warning("Tentativa de criar pedido vazio")
+                raise HTTPException(status_code=400, detail="Pedido não pode ser vazio")
 
             hoje = date.today()
 
@@ -50,7 +56,8 @@ class PedidoService:
             )
 
             if not cardapio:
-                raise Exception("Não existe cardápio ativo")
+                logger.warning(f"Sem cardápio ativo para unidade {pedido_data.id_unidade}")
+                raise HTTPException(status_code=404, detail="Não existe cardápio ativo")
 
             valor_total = 0
 
@@ -59,8 +66,11 @@ class PedidoService:
                     db, cardapio.id, item.produto_id
                 )
 
-                if not cardapio_produto or not cardapio_produto.ativo_no_cardapio:
-                    raise Exception(f"Produto {item.produto_id} indisponível")
+                if not cardapio_produto:
+                    raise HTTPException(status_code=404, detail="Produto não encontrado no cardápio")
+
+                if not cardapio_produto.ativo_no_cardapio:
+                    raise HTTPException(status_code=400, detail="Produto indisponível")
 
                 ingredientes = self.produto_ingrediente_repository.listar_por_produto(
                     db, item.produto_id
@@ -76,7 +86,8 @@ class PedidoService:
                         ing.id_ingrediente,
                         quantidade_necessaria
                     ):
-                        raise Exception(
+                        logger.warning(f"Estoque insuficiente para ingrediente {ing.id_ingrediente}")
+                        raise HTTPException(status_code=400, detail=
                             f"Estoque insuficiente para ingrediente {ing.id_ingrediente}"
                         )
 
@@ -91,7 +102,8 @@ class PedidoService:
                 )
 
                 if desconto > valor_total * 0.7:
-                    raise Exception("Desconto excede 70% do valor do pedido")
+                    logger.warning("Desconto excede limite permitido")
+                    raise HTTPException(status_code=400, detail="Desconto excede 70% do valor do pedido")
 
             valor_final = valor_total - desconto
 
@@ -127,25 +139,32 @@ class PedidoService:
                 )
 
             db.commit()
+
+            logger.info(f"Pedido {pedido_salvo.id} criado com sucesso")
+
             return pedido_salvo
 
-        except Exception:
+        except Exception as e:
             db.rollback()
+            logger.error(f"Erro ao criar pedido: {str(e)}")
             raise
 
     def buscar_pedido(self, db: Session, pedido_id: int, usuario):
         pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
 
         if not pedido:
-            raise Exception("Pedido não encontrado")
+            logger.warning(f"Pedido {pedido_id} não encontrado")
+            raise HTTPException(status_code=404, detail="Pedido não encontrado")
 
         if usuario.perfil == PerfilUsuario.CLIENTE:
             if pedido.id_usuario != usuario.id:
-                raise Exception("Acesso negado")
+                logger.warning(f"Cliente {usuario.id} tentou acessar pedido {pedido_id}")
+                raise HTTPException(status_code=403, detail="Acesso negado")
 
         if usuario.perfil == PerfilUsuario.ATENDENTE:
             if pedido.id_unidade != usuario.id_unidade:
-                raise Exception("Acesso negado")
+                logger.warning(f"Atendente {usuario.id} tentou acessar outra unidade")
+                raise HTTPException(status_code=403, detail="Acesso negado")
 
         return pedido
 
@@ -165,20 +184,27 @@ class PedidoService:
         pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
 
         if not pedido:
-            raise Exception("Pedido não encontrado")
-        
+            logger.warning(f"Tentativa de cancelar pedido inexistente {pedido_id}")
+            raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    
         if usuario.perfil == PerfilUsuario.ATENDENTE:
             if pedido.id_unidade != usuario.id_unidade:
-                raise Exception("Você não pode acessar pedidos de outra unidade")
+                logger.warning("Atendente tentando cancelar pedido de outra unidade")
+                raise HTTPException(status_code=403, detail="Você não pode acessar pedidos de outra unidade")
 
         if usuario.perfil == PerfilUsuario.CLIENTE:
             if pedido.id_usuario != usuario.id:
-                raise Exception("Você não pode cancelar este pedido")
+                logger.warning("Cliente tentando cancelar pedido de outro cliente")
+                raise HTTPException(status_code=403, detail="Você não pode cancelar este pedido")
 
         if pedido.status_pagamento == StatusPagamento.PAGO:
-            raise Exception("Não é possível cancelar um pedido já pago")
+            logger.warning(f"Tentativa de cancelar pedido pago {pedido_id}")
+            raise HTTPException(status_code=400, detail="Não é possível cancelar um pedido já pago")
 
         pedido.status_pagamento = StatusPagamento.CANCELADO
 
         db.commit()
+
+        logger.info(f"Pedido {pedido_id} cancelado com sucesso")
+
         return pedido

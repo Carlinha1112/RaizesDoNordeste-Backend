@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from src.infrastructure.repositories.cardapio_produto_repository import CardapioProdutoRepository
 from src.domain.entities.cardapio_produto import CardapioProduto
+from fastapi import HTTPException
 
 from src.api.schemas.cardapio_produto_schema import (
     CardapioProdutoCreate,
@@ -43,7 +44,7 @@ class CardapioProdutoService:
     ):
         item = self.repository.buscar(db, cardapio_id, produto_id)
         if not item:
-            raise Exception("Produto não encontrado no cardápio")
+            raise HTTPException(status_code=404, detail="Produto não encontrado no cardápio")
         item.preco_venda = dados.preco_venda
         item.ativo_no_cardapio = dados.ativo_no_cardapio
         return self.repository.atualizar(db, item)

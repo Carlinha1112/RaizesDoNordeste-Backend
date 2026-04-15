@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from src.infrastructure.repositories.unidade_repository import UnidadeRepository
 from src.domain.entities.unidade import Unidade
 from src.api.schemas.unidade_schema import UnidadeCreate
+from fastapi import HTTPException
 
 
 class UnidadeService:
@@ -18,7 +19,9 @@ class UnidadeService:
             ativo=True
         )
 
-        return self.unidade_repository.criar(db, unidade)
+        unidade = self.unidade_repository.criar(db, unidade)
+        db.commit()
+        return unidade
 
 
     def buscar_unidade(self, db: Session, unidade_id: int):
@@ -38,6 +41,8 @@ class UnidadeService:
         unidade = self.unidade_repository.buscar_por_id(db, unidade_id)
 
         if not unidade:
-            raise Exception("Unidade não encontrada")
+            raise HTTPException(status_code=404, detail="Unidade não encontrada")
 
-        return self.unidade_repository.desativar(db, unidade)
+        unidade = self.unidade_repository.desativar(db, unidade)
+        db.commit()
+        return unidade

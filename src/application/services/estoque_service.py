@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from src.infrastructure.repositories.estoque_repository import EstoqueRepository
+from fastapi import HTTPException
 
 
 class EstoqueService:
@@ -25,7 +26,7 @@ class EstoqueService:
         quantidade: float
     ):
         if not self.estoque_repository.tem_estoque(db, ingrediente_id, quantidade):
-            raise Exception("Estoque insuficiente")
+            raise HTTPException(status_code=400, detail="Estoque insuficiente")
 
         return self.estoque_repository.debitar_estoque(
             db,

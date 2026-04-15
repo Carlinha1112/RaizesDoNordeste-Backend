@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 
 from src.infrastructure.repositories.produto_repository import ProdutoRepository
 from src.infrastructure.repositories.produto_ingrediente_repository import ProdutoIngredienteRepository
@@ -36,7 +37,7 @@ class ProdutoService:
                     item.ingrediente_id
                 )
                 if not ingrediente:
-                    raise Exception(f"Ingrediente {item.ingrediente_id} não existe")
+                    raise HTTPException(status_code=404, detail=f"Ingrediente {item.ingrediente_id} não existe")
                 relacao = ProdutoIngrediente(
                     id_produto=produto_salvo.id,
                     id_ingrediente=item.ingrediente_id,
@@ -65,6 +66,8 @@ class ProdutoService:
     def desativar_produto(self, db: Session, produto_id: int):
         produto = self.produto_repository.buscar_por_id(db, produto_id)
         if not produto:
-            raise Exception("Produto não encontrado")
+            raise HTTPException(status_code=404, detail="Produto não encontrado")
 
-        return self.produto_repository.desativar(db, produto)
+        produto = self.produto_repository.desativar(db, produto)
+        db.commit()
+        return produto
