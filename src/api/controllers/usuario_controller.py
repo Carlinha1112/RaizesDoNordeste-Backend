@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from src.api.dependencies.role_dependency import require_role
+from src.domain.entities.usuario import PerfilUsuario
 from src.infrastructure.database.database import get_db
 from src.infrastructure.repositories.usuario_repository import UsuarioRepository
 from src.application.services.usuario_service import UsuarioService
 from src.api.schemas.usuario_schema import UsuarioCreate, UsuarioResponse
-
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
@@ -29,9 +30,10 @@ def buscar_usuario(
 ):
     return service.buscar_usuario(db, usuario_id)
 
-@router.get("/", response_model=list[UsuarioResponse])
+@router.get("/")
 def listar_usuarios(
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE)),
     service: UsuarioService = Depends(get_usuario_service)
 ):
     return service.listar_usuarios(db)
@@ -41,6 +43,7 @@ def listar_usuarios(
 def desativar_usuario(
     usuario_id: int,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE)),
     service: UsuarioService = Depends(get_usuario_service)
 ):
     return service.desativar_usuario(db, usuario_id)

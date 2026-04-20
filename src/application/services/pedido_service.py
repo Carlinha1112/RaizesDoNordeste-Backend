@@ -83,12 +83,18 @@ class PedidoService:
 
                     if not self.estoque_repository.tem_estoque(
                         db,
+                        pedido_data.id_unidade,
                         ing.id_ingrediente,
                         quantidade_necessaria
                     ):
-                        logger.warning(f"Estoque insuficiente para ingrediente {ing.id_ingrediente}")
-                        raise HTTPException(status_code=400, detail=
-                            f"Estoque insuficiente para ingrediente {ing.id_ingrediente}"
+                        logger.warning(
+                            f"Estoque insuficiente na unidade {pedido_data.id_unidade} "
+                            f"para ingrediente {ing.id_ingrediente}"
+                        )
+
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Estoque insuficiente para ingrediente {ing.id_ingrediente}"
                         )
 
                 valor_total += cardapio_produto.preco_venda * item.quantidade

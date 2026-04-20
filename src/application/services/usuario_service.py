@@ -21,8 +21,9 @@ class UsuarioService:
 
         usuario_entity = Usuario(
             nome=usuario.nome,
+            data_nasc=usuario.data_nasc,
             email=usuario.email,
-            senha_hash="",  
+            telefone=usuario.telefone,
             perfil=usuario.perfil,
             id_unidade=usuario.id_unidade
         )

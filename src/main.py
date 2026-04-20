@@ -1,4 +1,3 @@
-from fastapi import FastAPI
 from src.api.controllers import auth_controller
 from src.api.controllers import pedido_controller
 from src.api.controllers import fidelidade_controller
