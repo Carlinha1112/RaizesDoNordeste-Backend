@@ -5,6 +5,8 @@ from typing import List
 from src.infrastructure.database.database import get_db
 from src.infrastructure.repositories.cardapio_produto_repository import CardapioProdutoRepository
 from src.application.services.cardapio_produto_service import CardapioProdutoService
+from src.domain.entities.usuario import PerfilUsuario
+from src.api.dependencies.role_dependency import require_role
 
 from src.api.schemas.cardapio_produto_schema import (
     CardapioProdutoCreate,
@@ -24,6 +26,7 @@ def adicionar_produto(
     cardapio_id: int,
     dados: CardapioProdutoCreate,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE)),
     service: CardapioProdutoService = Depends(get_cardapio_produto_service)
 ):
     return service.adicionar_produto(db, cardapio_id, dados)
@@ -33,6 +36,7 @@ def adicionar_produto(
 def listar_produtos(
     cardapio_id: int,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: CardapioProdutoService = Depends(get_cardapio_produto_service)
 ):
     return service.listar_produtos(db, cardapio_id)
@@ -44,6 +48,7 @@ def atualizar_produto(
     produto_id: int,
     dados: CardapioProdutoUpdate,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE)),
     service: CardapioProdutoService = Depends(get_cardapio_produto_service)
 ):
     return service.atualizar_produto(db, cardapio_id, produto_id, dados)

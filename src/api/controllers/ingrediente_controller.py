@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from src.api.dependencies.role_dependency import require_role
+from src.domain.entities.usuario import PerfilUsuario
 
 from src.infrastructure.database.database import get_db
 from src.infrastructure.repositories.ingrediente_repository import IngredienteRepository
@@ -18,6 +20,7 @@ def get_service():
 def criar_ingrediente(
     ingrediente: IngredienteCreate,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE)),
     service: IngredienteService = Depends(get_service)
 ):
     return service.criar_ingrediente(db, ingrediente)
@@ -26,6 +29,7 @@ def criar_ingrediente(
 @router.get("/", response_model=list[IngredienteResponse])
 def listar_ingredientes(
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: IngredienteService = Depends(get_service)
 ):
     return service.listar_ingredientes(db)
@@ -35,6 +39,7 @@ def listar_ingredientes(
 def buscar_ingrediente(
     ingrediente_id: int,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: IngredienteService = Depends(get_service)
 ):
     return service.buscar_ingrediente(db, ingrediente_id)

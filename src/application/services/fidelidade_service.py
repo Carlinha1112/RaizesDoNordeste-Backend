@@ -1,72 +1,107 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
+from src.domain.entities.fidelidade import Fidelidade
+from src.domain.entities.historico_fidelidade import (
+    TipoMovimento,
+    Origem
+)
+
+
 
 class FidelidadeService:
 
     PONTOS_POR_REAL = 1
-    VALOR_POR_PONTO = 0.25
+    VALOR_POR_PONTO = 0.10
     LIMITE_DESCONTO = 0.70
 
     def __init__(self, fidelidade_repository, historico_repository):
         self.fidelidade_repository = fidelidade_repository
         self.historico_repository = historico_repository
 
-    def buscar_fidelidade_usuario(self, db: Session, usuario_id: int):
-        return self.fidelidade_repository.buscar_por_usuario(db, usuario_id)
+    def buscar_ou_criar(
+        self,
+        db: Session,
+        usuario_id: int
+    ):
+        fidelidade = self.fidelidade_repository.buscar_por_usuario(
+            db,
+            usuario_id
+        )
 
-    def calcular_pontos_por_valor(self, valor_pedido: float) -> int:
-        return int(valor_pedido * self.PONTOS_POR_REAL)
+        if fidelidade:
+            return fidelidade
 
-    def calcular_desconto_por_pontos(self, pontos: int) -> float:
-        return pontos * self.VALOR_POR_PONTO
+        nova = Fidelidade(
+            id_usuario=usuario_id,
+            saldo_pontos=0
+        )
 
-    def aplicar_limite_desconto(self, valor_pedido: float, desconto: float):
-        limite = valor_pedido * self.LIMITE_DESCONTO
-        return min(desconto, limite)
+        return self.fidelidade_repository.criar(db, nova)
 
-    def calcular_desconto(self, valor_pedido: float, pontos_usados: int):
-        desconto = self.calcular_desconto_por_pontos(pontos_usados)
-        return self.aplicar_limite_desconto(valor_pedido, desconto)
+    def adicionar_pontos(
+        self,
+        db: Session,
+        usuario_id: int,
+        valor_pedido: float
+    ):
+        fidelidade = self.buscar_ou_criar(
+            db,
+            usuario_id
+        )
 
-    def adicionar_pontos(self, db: Session, usuario_id: int, valor_pedido: float):
-        fidelidade = self.fidelidade_repository.buscar_por_usuario(db, usuario_id)
-
-        if not fidelidade:
-            raise HTTPException(status_code=404, detail="Conta de fidelidade não encontrada")
-
-        pontos = self.calcular_pontos_por_valor(valor_pedido)
+        pontos = int(valor_pedido * self.PONTOS_POR_REAL)
 
         fidelidade.saldo_pontos += pontos
 
         self.historico_repository.registrar(
             db=db,
+            fidelidade_id=fidelidade.id,
             usuario_id=usuario_id,
             pontos=pontos,
-            tipo="CREDITO"
+            tipo=TipoMovimento.CREDITO,
+            origem=Origem.PEDIDO
         )
 
         return fidelidade
 
-    def debitar_pontos(self, db: Session, usuario_id: int, pontos: int):
-        fidelidade = self.fidelidade_repository.buscar_por_usuario(db, usuario_id)
-
-        if not fidelidade:
-            raise HTTPException(status_code=404, detail="Conta de fidelidade não encontrada")
+    def debitar_pontos(
+        self,
+        db: Session,
+        usuario_id: int,
+        pontos: int
+    ):
+        fidelidade = self.buscar_ou_criar(
+            db,
+            usuario_id
+        )
 
         if fidelidade.saldo_pontos < pontos:
-            raise HTTPException(status_code=400, detail="Pontos insuficientes")
+            raise HTTPException(
+                400,
+                "Pontos insuficientes"
+            )
 
         fidelidade.saldo_pontos -= pontos
 
         self.historico_repository.registrar(
             db=db,
+            fidelidade_id=fidelidade.id,
             usuario_id=usuario_id,
             pontos=pontos,
-            tipo="DEBITO"
+            tipo=TipoMovimento.DEBITO,
+            origem=Origem.CONVERSAO_PONTOS
         )
 
         return fidelidade
 
-    def consultar_pontos(self, db: Session, usuario_id: int):
-        fidelidade = self.fidelidade_repository.buscar_por_usuario(db, usuario_id)
-        return fidelidade.saldo_pontos if fidelidade else 0
+    def consultar_pontos(
+        self,
+        db: Session,
+        usuario_id: int
+    ):
+        fidelidade = self.buscar_ou_criar(
+            db,
+            usuario_id
+        )
+
+        return fidelidade.saldo_pontos

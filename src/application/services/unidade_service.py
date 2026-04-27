@@ -25,7 +25,12 @@ class UnidadeService:
 
 
     def buscar_unidade(self, db: Session, unidade_id: int):
-        return self.unidade_repository.buscar_por_id(db, unidade_id)
+        unidade = self.unidade_repository.buscar_por_id(db, unidade_id)
+
+        if not unidade:
+            raise HTTPException(404, "Unidade não encontrada")
+
+        return unidade
 
 
     def listar_unidades(self, db: Session):

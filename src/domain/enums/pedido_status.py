@@ -1,0 +1,15 @@
+import enum
+
+
+class StatusPedido(str, enum.Enum):
+    AGUARDANDO_PAGAMENTO = "AGUARDANDO_PAGAMENTO"
+    PAGO = "PAGO"
+    FINALIZADO = "FINALIZADO"
+    CANCELADO = "CANCELADO"
+
+
+class StatusPreparo(str, enum.Enum):
+    AGUARDANDO_PREPARO = "AGUARDANDO_PREPARO"
+    EM_PREPARO = "EM_PREPARO"
+    PRONTO = "PRONTO"
+    FINALIZADO = "FINALIZADO"

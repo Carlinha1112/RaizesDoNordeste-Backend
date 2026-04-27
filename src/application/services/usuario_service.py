@@ -51,4 +51,26 @@ class UsuarioService:
         self.repository.desativar(db, usuario)
         db.commit()
         return usuario
+    
+    def atualizar_usuario(self, db, usuario_id, dados, usuario_logado):
+        usuario_db = self.repository.buscar_por_id(db, usuario_id)
+
+        if not usuario_db:
+            raise HTTPException(404, "Usuário não encontrado")
+
+        if usuario_logado.perfil != PerfilUsuario.GERENTE and usuario_logado.id != usuario_id:
+            raise HTTPException(403, "Sem permissão")
+
+        if dados.nome:
+            usuario_db.nome = dados.nome
+
+        if dados.email:
+            usuario_db.email = dados.email
+
+        if dados.telefone:
+            usuario_db.telefone = dados.telefone
+
+        db.commit()
+        db.refresh(usuario_db)
+        return usuario_db
 

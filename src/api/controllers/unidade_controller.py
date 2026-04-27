@@ -29,6 +29,7 @@ def criar_unidade(
 @router.get("/", response_model=List[UnidadeResponse])
 def listar_unidades(
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: UnidadeService = Depends(get_unidade_service)
 ):
     return service.listar_unidades(db)
@@ -37,6 +38,7 @@ def listar_unidades(
 @router.get("/ativas", response_model=List[UnidadeResponse])
 def listar_unidades_ativas(
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: UnidadeService = Depends(get_unidade_service)
 ):
     return service.listar_unidades_ativas(db)
@@ -46,12 +48,13 @@ def listar_unidades_ativas(
 def buscar_unidade(
     unidade_id: int,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: UnidadeService = Depends(get_unidade_service)
 ):
     return service.buscar_unidade(db, unidade_id)
 
 
-@router.patch("/{unidade_id}/desativar")
+@router.patch("/{unidade_id}/desativar", response_model=UnidadeResponse)
 def desativar_unidade(
     unidade_id: int,
     db: Session = Depends(get_db),

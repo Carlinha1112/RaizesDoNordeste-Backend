@@ -1,47 +1,211 @@
 from sqlalchemy.orm import Session
-from src.infrastructure.repositories.estoque_repository import EstoqueRepository
 from fastapi import HTTPException
+
+from src.domain.entities.estoque import Estoque
+from src.domain.entities.usuario import PerfilUsuario
+
+from src.infrastructure.repositories.estoque_repository import (
+    EstoqueRepository
+)
 
 
 class EstoqueService:
-    def __init__(self, estoque_repository: EstoqueRepository):
-        self.estoque_repository = estoque_repository
 
-    def verificar_estoque(
+    def __init__(self):
+        self.repository = EstoqueRepository()
+
+    def criar_ou_repor(
         self,
         db: Session,
-        ingrediente_id: int,
-        quantidade_necessaria: float
-    ) -> bool:
-        return self.estoque_repository.tem_estoque(
-            db,
-            ingrediente_id,
-            quantidade_necessaria
-        )
-
-    def debitar_estoque(
-        self,
-        db: Session,
-        ingrediente_id: int,
-        quantidade: float
+        dados,
+        usuario
     ):
-        if not self.estoque_repository.tem_estoque(db, ingrediente_id, quantidade):
-            raise HTTPException(status_code=400, detail="Estoque insuficiente")
+        try:
+            self._validar_permissao(usuario)
 
-        return self.estoque_repository.debitar_estoque(
-            db,
-            ingrediente_id,
-            quantidade
-        )
+            item = self.repository.buscar_por_unidade_ingrediente(
+                db,
+                dados.id_unidade,
+                dados.id_ingrediente
+            )
 
-    def repor_estoque(
+            if item:
+                item.quantidade += dados.quantidade
+            else:
+                item = Estoque(
+                    id_unidade=dados.id_unidade,
+                    id_ingrediente=dados.id_ingrediente,
+                    quantidade=dados.quantidade
+                )
+                self.repository.criar(db, item)
+
+            db.commit()
+            db.refresh(item)
+
+            return item
+
+        except:
+            db.rollback()
+            raise
+
+    def listar(self, db: Session):
+        return self.repository.listar(db)
+
+    def listar_por_unidade(
         self,
         db: Session,
-        ingrediente_id: int,
-        quantidade: float
+        unidade_id: int
     ):
-        return self.estoque_repository.repor_estoque(
+        return self.repository.listar_por_unidade(
             db,
-            ingrediente_id,
-            quantidade
+            unidade_id
         )
+
+    def entrada(
+        self,
+        db: Session,
+        estoque_id: int,
+        quantidade,
+        usuario
+    ):
+        try:
+            self._validar_permissao(usuario)
+
+            item = self._buscar_item(db, estoque_id)
+
+            item.quantidade += quantidade
+
+            db.commit()
+            db.refresh(item)
+
+            return item
+
+        except:
+            db.rollback()
+            raise
+
+    def saida(
+        self,
+        db: Session,
+        estoque_id: int,
+        quantidade,
+        usuario
+    ):
+        try:
+            self._validar_permissao(usuario)
+
+            item = self._buscar_item(db, estoque_id)
+
+            if item.quantidade < quantidade:
+                raise HTTPException(
+                    400,
+                    "Estoque insuficiente"
+                )
+
+            item.quantidade -= quantidade
+
+            db.commit()
+            db.refresh(item)
+
+            return item
+
+        except:
+            db.rollback()
+            raise
+
+    def ajustar(
+        self,
+        db: Session,
+        estoque_id: int,
+        quantidade,
+        usuario
+    ):
+        try:
+            self._validar_permissao(usuario)
+
+            item = self._buscar_item(db, estoque_id)
+
+            item.quantidade = quantidade
+
+            db.commit()
+            db.refresh(item)
+
+            return item
+
+        except:
+            db.rollback()
+            raise
+
+    def excluir(
+        self,
+        db: Session,
+        estoque_id: int,
+        usuario
+    ):
+        try:
+            if usuario.perfil != PerfilUsuario.GERENTE:
+                raise HTTPException(
+                    403,
+                    "Sem permissão"
+                )
+
+            item = self._buscar_item(db, estoque_id)
+
+            db.delete(item)
+            db.commit()
+
+        except:
+            db.rollback()
+            raise
+
+    def debitar_por_pedido(
+        self,
+        db: Session,
+        unidade_id: int,
+        ingrediente_id: int,
+        quantidade
+    ):
+        item = self.repository.buscar_por_unidade_ingrediente(
+            db,
+            unidade_id,
+            ingrediente_id
+        )
+
+        if not item:
+            raise HTTPException(
+                404,
+                "Ingrediente sem estoque"
+            )
+
+        if item.quantidade < quantidade:
+            raise HTTPException(
+                400,
+                "Estoque insuficiente"
+            )
+
+        item.quantidade -= quantidade
+        db.flush()
+
+    def _buscar_item(self, db, estoque_id):
+        item = self.repository.buscar_por_id(
+            db,
+            estoque_id
+        )
+
+        if not item:
+            raise HTTPException(
+                404,
+                "Item não encontrado"
+            )
+
+        return item
+
+    def _validar_permissao(self, usuario):
+        if usuario.perfil not in [
+            PerfilUsuario.GERENTE,
+            PerfilUsuario.ATENDENTE
+        ]:
+            raise HTTPException(
+                403,
+                "Sem permissão"
+            )

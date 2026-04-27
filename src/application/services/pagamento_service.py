@@ -3,9 +3,10 @@ import logging
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-from src.domain.entities.pagamento import Pagamento, StatusPagamento, Metodo
-from src.domain.entities.pedido import StatusPagamento
+from src.domain.entities.pagamento import Pagamento, Metodo
 from src.domain.entities.usuario import PerfilUsuario
+from src.domain.enums.pagamento_status import StatusPagamento
+from src.application.services.pedido_domain import PedidoDomain
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,9 @@ class PagamentoService:
         self.estoque_repository = estoque_repository
         self.fidelidade_service = fidelidade_service
 
+    # =====================================================
+    # PROCESSAR PAGAMENTO
+    # =====================================================
     def processar_pagamento(
         self,
         db: Session,
@@ -33,127 +37,121 @@ class PagamentoService:
         metodo: Metodo,
         usuario
     ):
+
+        pedido = self.pedido_repository.buscar_por_id(
+            db,
+            pedido_id
+        )
+
+        if not pedido:
+            raise HTTPException(
+                status_code=404,
+                detail="Pedido não encontrado"
+            )
+
+        # ==========================================
+        # SEGURANÇA
+        # ==========================================
+        if usuario.perfil == PerfilUsuario.CLIENTE:
+            if pedido.id_usuario != usuario.id:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Você não pode pagar este pedido"
+                )
+
+        if usuario.perfil == PerfilUsuario.ATENDENTE:
+            if pedido.id_unidade != usuario.id_unidade:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Você não pode pagar pedidos de outra unidade"
+                )
+
+        # ==========================================
+        # VALIDA STATUS
+        # ==========================================
+        if not PedidoDomain.pode_ser_pago(
+            pedido.status_pedido
+        ):
+            raise HTTPException(
+                status_code=409,
+                detail="Pedido não pode ser pago"
+            )
+
+        # ==========================================
+        # REGRAS DE APROVAÇÃO
+        # ==========================================
+        # PIX sempre aprova
+        # Dinheiro sempre aprova
+        # Cartão pode negar aleatoriamente
+        if metodo == Metodo.PIX:
+            aprovado = True
+
+        elif metodo == Metodo.DINHEIRO:
+            aprovado = True
+
+        elif metodo == Metodo.CARTAO:
+            aprovado = random.choice(
+                [True, True, True, False]
+            )
+
+        else:
+            aprovado = False
+
+        # ==========================================
+        # CRIA REGISTRO PAGAMENTO
+        # ==========================================
+        pagamento = Pagamento(
+            id_pedido=pedido.id,
+            metodo=metodo,
+            status=(
+                StatusPagamento.APROVADO
+                if aprovado
+                else StatusPagamento.NEGADO
+            ),
+            valor_pago=pedido.valor_total
+        )
+
         try:
-            logger.info(
-                f"[PAGAMENTO] Usuário {usuario.id} iniciou pagamento do pedido {pedido_id}"
+
+            self.pagamento_repository.criar(
+                db,
+                pagamento
             )
 
-            pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
-
-            if not pedido:
-                logger.warning(f"[PAGAMENTO] Pedido {pedido_id} não encontrado")
-                raise HTTPException(
-                    status_code=404,
-                    detail="Pedido não encontrado"
-                )
-
-            if pedido.status_pagamento != StatusPagamento.AGUARDANDO_PAGAMENTO:
-                logger.warning(
-                    f"[PAGAMENTO] Pedido {pedido_id} não está aguardando pagamento"
-                )
-                raise HTTPException(
-                    status_code=409,
-                    detail="Pedido não está aguardando pagamento"
-                )
-
-            # Controle de acesso
-            if usuario.perfil == PerfilUsuario.CLIENTE:
-                if pedido.id_usuario != usuario.id:
-                    logger.warning(
-                        f"[SEGURANÇA] Cliente {usuario.id} tentou pagar pedido de outro usuário"
-                    )
-                    raise HTTPException(
-                        status_code=403,
-                        detail="Você não pode pagar este pedido"
-                    )
-
-            if usuario.perfil == PerfilUsuario.ATENDENTE:
-                if pedido.id_unidade != usuario.id_unidade:
-                    logger.warning(
-                        f"[SEGURANÇA] Atendente {usuario.id} tentou acessar outra unidade"
-                    )
-                    raise HTTPException(
-                        status_code=403,
-                        detail="Você não pode pagar pedidos de outra unidade"
-                    )
-
-            # Mock pagamento
-            if metodo == Metodo.PIX:
-                aprovado = True
-            else:
-                aprovado = random.choice([True, False])
-
-            status_pagamento = (
-                StatusPagamento.APROVADO if aprovado else StatusPagamento.NEGADO
-            )
-
-            pagamento = Pagamento(
-                id_pedido=pedido.id,
-                metodo=metodo,
-                status=status_pagamento,
-                valor_pago=pedido.valor_total
-            )
-
-            pagamento_salvo = self.pagamento_repository.criar(db, pagamento)
-
-            # Pagamento aprovado
+            # ==================================
+            # SE APROVADO
+            # ==================================
             if aprovado:
-                logger.info(f"[PAGAMENTO] Pedido {pedido.id} aprovado")
 
-                pedido.status_pagamento = StatusPagamento.PAGO
+                PedidoDomain.marcar_como_pago(
+                    pedido
+                )
 
-                itens = pedido.itens
+                # só gera fidelidade se existir cliente
+                if pedido.id_usuario:
 
-                for item in itens:
-                    ingredientes = (
-                        self.produto_ingrediente_repository.listar_por_produto(
-                            db,
-                            item.id_produto
+                    self.fidelidade_service.adicionar_pontos(
+                        db=db,
+                        usuario_id=pedido.id_usuario,
+                        valor_pedido=float(
+                            pedido.valor_total
                         )
                     )
-
-                    for ing in ingredientes:
-                        quantidade = (
-                            ing.quantidade_necessaria * item.quantidade
-                        )
-
-                        # RF08 - estoque por unidade
-                        self.estoque_repository.debitar_estoque(
-                            db,
-                            pedido.id_unidade,
-                            ing.id_ingrediente,
-                            quantidade
-                        )
-
-                # Fidelidade
-                self.fidelidade_service.adicionar_pontos(
-                    db,
-                    pedido.id_usuario,
-                    pedido.valor_total
-                )
-
-            # Pagamento negado
-            else:
-                logger.warning(f"[PAGAMENTO] Pedido {pedido.id} NEGADO")
-
-                pedido.status_pagamento = (
-                    StatusPagamento.AGUARDANDO_PAGAMENTO
-                )
 
             db.commit()
+            db.refresh(pagamento)
 
-            logger.info(
-                f"[PAGAMENTO] Processamento finalizado para pedido {pedido.id}"
-            )
+            return pagamento
 
-            return pagamento_salvo
+        except HTTPException:
+            db.rollback()
+            raise
 
         except Exception as e:
             db.rollback()
+            logger.exception(e)
 
-            logger.error(
-                f"[ERRO] Falha ao processar pagamento do pedido "
-                f"{pedido_id}: {str(e)}"
+            raise HTTPException(
+                status_code=500,
+                detail="Erro interno ao processar pagamento"
             )
-
-            raise

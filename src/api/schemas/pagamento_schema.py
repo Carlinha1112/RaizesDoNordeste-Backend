@@ -11,7 +11,7 @@ class MetodoPagamento(str, Enum):
 class StatusPagamento(str, Enum):
     PENDENTE = "PENDENTE"
     APROVADO = "APROVADO"
-    RECUSADO = "RECUSADO"
+    NEGADO = "NEGADO"
 
 class PagamentoResponse(BaseModel):
     id: int

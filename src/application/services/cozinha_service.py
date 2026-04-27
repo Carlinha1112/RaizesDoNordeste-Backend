@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from src.domain.entities.pedido import Pedido, StatusPagamento, StatusPreparo
+from src.domain.entities.pedido import Pedido
+from src.domain.enums.pedido_status import StatusPreparo
 from src.infrastructure.repositories.pedido_repository import PedidoRepository
 
 class CozinhaService:

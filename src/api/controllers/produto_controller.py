@@ -34,6 +34,7 @@ def criar_produto(
 @router.get("/", response_model=list[ProdutoResponse])
 def listar_produtos(
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: ProdutoService = Depends(get_service)
 ):
     return service.listar_produtos(db)
@@ -42,6 +43,7 @@ def listar_produtos(
 @router.get("/ativos", response_model=list[ProdutoResponse])
 def listar_produtos_ativos(
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: ProdutoService = Depends(get_service)
 ):
     return service.listar_produtos_ativos(db)
@@ -50,6 +52,7 @@ def listar_produtos_ativos(
 def buscar_produto(
     produto_id: int,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: ProdutoService = Depends(get_service)
 ):
     return service.buscar_produto(db, produto_id)

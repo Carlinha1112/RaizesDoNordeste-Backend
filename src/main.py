@@ -1,14 +1,23 @@
+from fastapi import FastAPI, HTTPException
+
+from src.infrastructure.database.database import Base, engine
+from src.domain.entities import *   
+
+from src.infrastructure.logging_config import setup_logging
+
 from src.api.controllers import auth_controller
 from src.api.controllers import pedido_controller
 from src.api.controllers import fidelidade_controller
 from src.api.controllers import usuario_controller
 from src.api.controllers import unidade_controller
 from src.api.controllers import cardapio_controller
+from src.api.controllers import cardapio_produto_controller
 from src.api.controllers import pagamento_controller
 from src.api.controllers import cozinha_controller
 from src.api.controllers import produto_controller
-from src.infrastructure.logging_config import setup_logging
-from fastapi import FastAPI, HTTPException
+from src.api.controllers import ingrediente_controller
+from src.api.controllers import estoque_controller
+
 from src.api.exceptions.exception_handler import (
     http_exception_handler,
     generic_exception_handler
@@ -40,6 +49,7 @@ Backend de API para gerenciamento de pedidos, produtos, estoque e fidelidade.
     }
 )
 
+Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def home():
@@ -50,12 +60,14 @@ app.include_router(usuario_controller.router)
 app.include_router(unidade_controller.router)
 app.include_router(produto_controller.router)
 app.include_router(cardapio_controller.router)
-
+app.include_router(cardapio_produto_controller.router)
 app.include_router(pedido_controller.router)
 app.include_router(pagamento_controller.router)
 
 app.include_router(fidelidade_controller.router)
 app.include_router(cozinha_controller.router)
+app.include_router(ingrediente_controller.router)
+app.include_router(estoque_controller.router)
 
 app.include_router(auth_controller.router) 
 

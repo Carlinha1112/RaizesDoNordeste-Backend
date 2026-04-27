@@ -1,14 +1,13 @@
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from src.infrastructure.database.database import Base
 
-
 class ProdutoIngrediente(Base):
-    __tablename__ = "produtos_ingredientes"
+    __tablename__ = "produto_ingrediente"
 
-    id_produto = Column(Integer, ForeignKey("produto.id"), primary_key=True)
-    id_ingrediente = Column(Integer, ForeignKey("ingrediente.id"), primary_key=True)
-    quantidade_necessaria = Column(Integer, nullable=False)   
-    
-    produto = relationship("Produto")
-    ingrediente = relationship("Ingrediente")
+    id = Column(Integer, primary_key=True)
+    produto_id = Column(Integer, ForeignKey("produto.id"))
+    ingrediente_id = Column(Integer, ForeignKey("ingrediente.id"))
+    quantidade = Column(Float)
+
+    produto = relationship("Produto", back_populates="ingredientes")

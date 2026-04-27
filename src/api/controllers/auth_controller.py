@@ -13,7 +13,7 @@ def get_auth_service():
     return AuthService(UsuarioRepository())
 
 
-@router.post("/login")
+@router.post("/login", summary="Autenticar usuário")
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),

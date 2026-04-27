@@ -29,6 +29,7 @@ def criar_cardapio(
 @router.get("/", response_model=List[CardapioResponse])
 def listar_cardapios(
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: CardapioService = Depends(get_cardapio_service)
 ):
     return service.listar_cardapios(db)
@@ -37,6 +38,7 @@ def listar_cardapios(
 @router.get("/ativos", response_model=List[CardapioResponse])
 def listar_cardapios_ativos(
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: CardapioService = Depends(get_cardapio_service)
 ):
     return service.listar_cardapios_ativos(db)
@@ -46,6 +48,7 @@ def listar_cardapios_ativos(
 def buscar_cardapio(
     cardapio_id: int,
     db: Session = Depends(get_db),
+    usuario = Depends(require_role(PerfilUsuario.GERENTE, PerfilUsuario.ATENDENTE)),
     service: CardapioService = Depends(get_cardapio_service)
 ):
     return service.buscar_cardapio(db, cardapio_id)

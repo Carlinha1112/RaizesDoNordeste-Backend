@@ -35,10 +35,7 @@ def pagar_pedido(
     pedido_id: int,
     metodo: Metodo,
     db: Session = Depends(get_db),
-    usuario = Depends(require_role(
-        PerfilUsuario.CLIENTE,
-        PerfilUsuario.ATENDENTE
-    )),
+    usuario = Depends(require_role(PerfilUsuario.CLIENTE, PerfilUsuario.ATENDENTE)),
     service: PagamentoService = Depends(get_service)
 ):
     return service.processar_pagamento(db, pedido_id, metodo, usuario)

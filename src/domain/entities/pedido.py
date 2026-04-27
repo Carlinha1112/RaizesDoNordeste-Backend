@@ -1,37 +1,38 @@
+import enum
 from sqlalchemy import Column, DateTime, Integer, ForeignKey, Enum, Numeric
 from sqlalchemy.orm import relationship
-from src.infrastructure.database.database import Base
 from datetime import datetime, timezone
-import enum
 
-class CanalPedido(enum.Enum):
+from src.infrastructure.database.database import Base
+from src.domain.enums.pedido_status import StatusPedido, StatusPreparo
+
+
+class CanalPedido(str, enum.Enum):
     APP = "APP"
     TOTEM = "TOTEM"
     BALCAO = "BALCAO"
     PICKUP = "PICKUP"
 
-class StatusPagamento(enum.Enum):
-    AGUARDANDO_PAGAMENTO = "AGUARDANDO PAGAMENTO"
-    PAGO = "PAGO"
-    CANCELADO = "CANCELADO"
-
-class StatusPreparo(enum.Enum):
-    AGUARDANDO_PREPARO = "AGUARDANDO PREPARO"
-    EM_PREPARO = "EM PREPARO"
-    PRONTO = "PRONTO"
-    FINALIZADO = "FINALIZADO"
 
 class Pedido(Base):
     __tablename__ = "pedido"
 
     id = Column(Integer, primary_key=True, index=True)
+
     id_unidade = Column(Integer, ForeignKey("unidade.id"), nullable=False)
-    id_usuario = Column(Integer, ForeignKey("usuario.id"), nullable=False)
+    id_usuario = Column(Integer, ForeignKey("usuario.id"), nullable=True)
+
     canal_pedido = Column(Enum(CanalPedido), nullable=False)
-    status_pagamento = Column(Enum(StatusPagamento))
-    status_preparo = Column(Enum(StatusPreparo))
+
+    status_pedido = Column(Enum(StatusPedido), nullable=False)
+    status_preparo = Column(Enum(StatusPreparo), nullable=True)
+
     valor_total = Column(Numeric(10, 2), nullable=False)
-    data_hora = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    
+
+    data_hora = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc)
+    )
+
     unidade = relationship("Unidade")
-    usuario = relationship("Usuario")   
+    usuario = relationship("Usuario")

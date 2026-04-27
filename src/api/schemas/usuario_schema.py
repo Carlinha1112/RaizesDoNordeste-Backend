@@ -19,6 +19,11 @@ class UsuarioCreate(BaseModel):
     perfil: PerfilUsuario
     id_unidade: int | None = None
 
+class UsuarioUpdate(BaseModel):
+    nome: str | None = None
+    telefone: str | None = None
+    email: str | None = None
+    senha: str | None = None
 
 class UsuarioResponse(BaseModel):
 
