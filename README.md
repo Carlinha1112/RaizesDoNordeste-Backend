@@ -338,3 +338,28 @@
    ```text
    https://github.com/Carlinha1112/RaizesDoNordeste-Backend
    ```
+   ---
+   ## 📬 Coleção Postman
+
+   A API possui uma coleção completa no Postman com todos os endpoints prontos para teste.
+
+   📁 Arquivo da coleção:
+
+   [Baixar coleção Postman](docs/RaizesDoNordeste_Postman_Collection.json)
+
+   ### Como usar
+
+   1. Abra o Postman
+   2. Clique em **Import**
+   3. Selecione o arquivo `.json`
+   4. Execute os endpoints
+
+   ### Funcionalidades testadas
+
+   - Autenticação JWT
+   - Usuários
+   - Pedidos
+   - Cozinha
+   - Estoque
+   - Fidelidade
+   - Pagamentos
