@@ -36,3 +36,8 @@ class Pedido(Base):
 
     unidade = relationship("Unidade")
     usuario = relationship("Usuario")
+    itens = relationship(
+        "ItemPedido",
+        back_populates="pedido",
+        cascade="all, delete-orphan"
+    )

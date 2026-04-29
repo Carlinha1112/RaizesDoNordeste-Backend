@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
+from decimal import Decimal
 
 from src.domain.entities.estoque import Estoque
 from src.domain.entities.usuario import PerfilUsuario
@@ -158,33 +159,51 @@ class EstoqueService:
             db.rollback()
             raise
 
-    def debitar_por_pedido(
-        self,
-        db: Session,
-        unidade_id: int,
-        ingrediente_id: int,
+    def baixar_estoque_por_pedido(self, db, pedido):
+
+        for item in pedido.itens:
+
+            produto = item.produto
+
+            for composicao in produto.ingredientes:
+
+                quantidade_total = (
+                    Decimal(str(composicao.quantidade))
+                    * Decimal(str(item.quantidade))
+                )
+
+                self.debitar_por_pedido(
+                    db,
+                    pedido.id_unidade,
+                    composicao.ingrediente_id,   # ou nome correto do campo
+                    quantidade_total
+                )
+    
+    def debitar_por_pedido( 
+        self, 
+        db: Session, 
+        unidade_id: int, 
+        ingrediente_id: int, 
         quantidade
-    ):
-        item = self.repository.buscar_por_unidade_ingrediente(
-            db,
-            unidade_id,
-            ingrediente_id
-        )
-
-        if not item:
-            raise HTTPException(
-                404,
-                "Ingrediente sem estoque"
-            )
-
-        if item.quantidade < quantidade:
-            raise HTTPException(
-                400,
-                "Estoque insuficiente"
-            )
-
-        item.quantidade -= quantidade
-        db.flush()
+    ): 
+        item = self.repository.buscar_por_unidade_ingrediente( 
+            db, 
+            unidade_id, 
+            ingrediente_id 
+        ) 
+        if not item: 
+            raise HTTPException( 
+                404, 
+                "Ingrediente sem estoque" 
+            ) 
+        quantidade = Decimal(str(quantidade))
+        if item.quantidade < quantidade: 
+            raise HTTPException( 
+                400, 
+                "Estoque insuficiente" 
+            ) 
+        item.quantidade -= quantidade 
+        db.flush() 
 
     def _buscar_item(self, db, estoque_id):
         item = self.repository.buscar_por_id(

@@ -15,5 +15,8 @@ class ItemPedido(Base):
     quantidade = Column(Integer, nullable=False)
     preco_unitario = Column(Numeric(10, 2), nullable=False)
 
-    pedido = relationship("Pedido")
+    pedido = relationship(
+        "Pedido",
+        back_populates="itens"
+    )
     produto = relationship("Produto")

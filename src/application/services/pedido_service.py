@@ -8,7 +8,7 @@ from src.domain.entities.pedido import Pedido
 from src.domain.entities.usuario import PerfilUsuario
 
 from src.api.schemas.pedido_schema import CanalPedido
-from src.domain.enums.pedido_status import StatusPedido, StatusPreparo
+from src.domain.enums.pedido_status import StatusPedido
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class PedidoService:
         pedido_repository,
         item_pedido_repository,
         produto_ingrediente_repository,
-        estoque_repository,
+        estoque_service,
         fidelidade_service,
         cardapio_repository,
         cardapio_produto_repository
@@ -28,7 +28,7 @@ class PedidoService:
         self.pedido_repository = pedido_repository
         self.item_repository = item_pedido_repository
         self.produto_ingrediente_repository = produto_ingrediente_repository
-        self.estoque_repository = estoque_repository
+        self.estoque_service = estoque_service  
         self.fidelidade_service = fidelidade_service
         self.cardapio_repository = cardapio_repository
         self.cardapio_produto_repository = cardapio_produto_repository
@@ -36,7 +36,7 @@ class PedidoService:
     # =====================================================
     # CRIAR PEDIDO
     # =====================================================
-    def criar_pedido(self, db: Session, pedido_data, itens, pontos_utilizados, usuario):
+    def criar_pedido(self, db, pedido_data, itens, pontos_utilizados, usuario):
 
         if not itens:
             raise HTTPException(400, "Pedido não pode ser vazio")
@@ -50,12 +50,14 @@ class PedidoService:
         if not cardapio:
             raise HTTPException(404, "Cardápio não encontrado")
 
-        # ==========================================
-        # CALCULA VALOR TOTAL
-        # ==========================================
+    # ==========================================
+    # VALIDA ITENS E CALCULA TOTAL
+    # ==========================================
         valor_total = 0
+        itens_processados = []
 
         for item in itens:
+
             cardapio_produto = self.cardapio_produto_repository.buscar(
                 db,
                 cardapio.id,
@@ -63,60 +65,76 @@ class PedidoService:
             )
 
             if not cardapio_produto:
-                raise HTTPException(404, f"Produto {item.produto_id} não encontrado")
+                raise HTTPException(
+                    404,
+                    f"Produto {item.produto_id} não encontrado no cardápio"
+                )
 
             if not cardapio_produto.ativo_no_cardapio:
-                raise HTTPException(400, f"Produto {item.produto_id} indisponível")
+                raise HTTPException(
+                    400,
+                    f"Produto {item.produto_id} indisponível"
+                )
 
-            valor_total += float(cardapio_produto.preco_venda) * item.quantidade
+            preco_unitario = float(cardapio_produto.preco_venda)
+            subtotal = preco_unitario * item.quantidade
+            valor_total += subtotal
 
-        # ==========================================
-        # DEFINIÇÃO DO CLIENTE DO PEDIDO
-        # ==========================================
-        id_cliente = None
+            itens_processados.append({
+                "produto_id": item.produto_id,
+                "quantidade": item.quantidade,
+                "preco_unitario": preco_unitario
+            })
 
-        if pedido_data.canal_pedido == CanalPedido.BALCAO:
+    # ==========================================
+    # DEFINE CLIENTE RESPONSÁVEL PELO PEDIDO
+    # ==========================================
+        id_cliente = usuario.id
 
-            # atendente pode informar cliente
-            if hasattr(pedido_data, "cliente_id") and pedido_data.cliente_id:
+    # Atendente criando pedido balcão
+        if usuario.perfil == PerfilUsuario.ATENDENTE:
+
+            if pedido_data.canal_pedido != CanalPedido.BALCAO:
+                raise HTTPException(
+                    403,
+                    "Atendente só pode criar pedido BALCAO"
+                )
+
+            # Cliente informado
+            if pedido_data.cliente_id:
                 id_cliente = pedido_data.cliente_id
+
+        # Pedido balcão sem cliente identificado
             else:
-                # sem cliente cadastrado → usa atendente como fallback
-                id_cliente = usuario.id
+                id_cliente = None
 
-        else:
-            # outros canais: sempre usuário logado
-            id_cliente = usuario.id
-
-        # segurança final
-        if id_cliente is None:
-            raise HTTPException(
-                400,
-                "Pedido precisa estar vinculado a um cliente"
-            )
-
-        # ==========================================
-        # CRIA PEDIDO
-        # ==========================================
+    # ==========================================
+    # CRIA PEDIDO
+    # ==========================================
         pedido = Pedido(
             id_unidade=pedido_data.id_unidade,
             id_usuario=id_cliente,
             canal_pedido=pedido_data.canal_pedido,
             status_pedido=StatusPedido.AGUARDANDO_PAGAMENTO,
-            status_preparo=StatusPreparo.AGUARDANDO_PREPARO,
+            status_preparo=None,
             valor_total=valor_total
         )
 
         try:
             pedido = self.pedido_repository.criar(db, pedido)
 
-            # itens do pedido
-            for item in itens:
+        # ==========================================
+        # CRIA ITENS DO PEDIDO
+        # ==========================================
+            for item in itens_processados:
+
                 item_pedido = ItemPedido(
                     id_pedido=pedido.id,
-                    id_produto=item.produto_id,
-                    quantidade=item.quantidade
+                    id_produto=item["produto_id"],
+                    quantidade=item["quantidade"],
+                    preco_unitario=item["preco_unitario"]
                 )
+
                 self.item_repository.criar(db, item_pedido)
 
             db.commit()
@@ -124,17 +142,28 @@ class PedidoService:
 
             return pedido
 
+        except HTTPException:
+            db.rollback()
+            raise
+
         except Exception as e:
             db.rollback()
             logger.exception(e)
-            raise HTTPException(500, "Erro interno ao criar pedido")
+
+            raise HTTPException(
+                500,
+                "Erro interno ao criar pedido"
+            )
 
     # =====================================================
     # BUSCAR PEDIDO
     # =====================================================
     def buscar_pedido(self, db: Session, pedido_id: int, usuario):
 
-        pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
+        pedido = self.pedido_repository.buscar_por_id(
+            db,
+            pedido_id
+        )
 
         if not pedido:
             raise HTTPException(404, "Pedido não encontrado")
@@ -152,18 +181,32 @@ class PedidoService:
     # =====================================================
     # LISTAR PEDIDOS
     # =====================================================
-    def listar_pedidos(self, db: Session, usuario, canal: CanalPedido | None = None):
+    def listar_pedidos(
+        self,
+        db: Session,
+        usuario,
+        canal: CanalPedido | None = None
+    ):
 
         if usuario.perfil == PerfilUsuario.CLIENTE:
-            return self.pedido_repository.listar_por_usuario(db, usuario.id)
+            return self.pedido_repository.listar_por_usuario(
+                db,
+                usuario.id
+            )
 
         if usuario.perfil == PerfilUsuario.ATENDENTE:
-            return self.pedido_repository.listar_por_unidade(db, usuario.id_unidade)
+            return self.pedido_repository.listar_por_unidade(
+                db,
+                usuario.id_unidade
+            )
 
         if usuario.perfil == PerfilUsuario.GERENTE:
 
             if canal:
-                return self.pedido_repository.listar_por_canal(db, canal)
+                return self.pedido_repository.listar_por_canal(
+                    db,
+                    canal
+                )
 
             return self.pedido_repository.listar(db)
 
@@ -174,18 +217,23 @@ class PedidoService:
     # =====================================================
     def cancelar_pedido(self, db, pedido_id, usuario):
 
-        pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
+        pedido = self.pedido_repository.buscar_por_id(
+            db,
+            pedido_id
+        )
 
         if not pedido:
             raise HTTPException(404, "Pedido não encontrado")
 
         if pedido.status_pedido == StatusPedido.PAGO:
-            raise HTTPException(400, "Pedido pago não pode ser cancelado")
+            raise HTTPException(
+                400,
+                "Pedido pago não pode ser cancelado"
+            )
 
         pedido.status_pedido = StatusPedido.CANCELADO
 
         db.commit()
-        db.refresh(pedido)
 
         return pedido
 
@@ -194,12 +242,15 @@ class PedidoService:
     # =====================================================
     def iniciar_preparo(self, db, pedido_id):
 
-        pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
+        pedido = self.pedido_repository.buscar_por_id(
+            db,
+            pedido_id
+        )
 
         if not pedido:
             raise HTTPException(404, "Pedido não encontrado")
 
-        pedido.status_preparo = StatusPreparo.EM_PREPARO
+        pedido.status_preparo = "EM_PREPARO"
 
         db.commit()
         db.refresh(pedido)
@@ -208,26 +259,34 @@ class PedidoService:
 
     def marcar_pronto(self, db, pedido_id):
 
-        pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
+        pedido = self.pedido_repository.buscar_por_id(
+            db,
+            pedido_id
+        )
 
         if not pedido:
             raise HTTPException(404, "Pedido não encontrado")
 
-        pedido.status_preparo = StatusPreparo.PRONTO
+        pedido.status_preparo = "PRONTO"
 
         db.commit()
         db.refresh(pedido)
 
         return pedido
 
-    def finalizar(self, db, pedido_id):
+    def finalizar_pedido(self, db, pedido_id):
 
         pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
 
         if not pedido:
             raise HTTPException(404, "Pedido não encontrado")
 
-        pedido.status_preparo = StatusPreparo.FINALIZADO
+        if pedido.status_preparo == "FINALIZADO":
+            raise HTTPException(400, "Pedido já finalizado")
+
+        self.estoque_service.baixar_estoque_por_pedido(db, pedido)
+
+        pedido.status_preparo = "FINALIZADO"
 
         db.commit()
         db.refresh(pedido)

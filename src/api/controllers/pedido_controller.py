@@ -5,6 +5,7 @@ from src.infrastructure.database.database import get_db
 
 from src.application.services.pedido_service import PedidoService
 from src.application.services.fidelidade_service import FidelidadeService
+from src.application.services.estoque_service import EstoqueService
 
 from src.infrastructure.repositories.pedido_repository import PedidoRepository
 from src.infrastructure.repositories.item_pedido_repository import ItemPedidoRepository
@@ -45,7 +46,7 @@ def get_pedido_service():
         PedidoRepository(),
         ItemPedidoRepository(),
         ProdutoIngredienteRepository(),
-        EstoqueRepository(),
+        EstoqueService(),
         get_fidelidade_service(),
         CardapioRepository(),
         CardapioProdutoRepository()

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from src.infrastructure.repositories.usuario_repository import UsuarioRepository
 from src.domain.entities.usuario import Usuario
 from src.api.schemas.usuario_schema import UsuarioCreate
-from src.domain.entities.usuario import PerfilUsuario
+from src.api.schemas.usuario_schema import PerfilUsuario
 from passlib.context import CryptContext
 from fastapi import HTTPException
 

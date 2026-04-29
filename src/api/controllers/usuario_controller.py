@@ -32,7 +32,7 @@ def buscar_usuario(
 ):
     return service.buscar_usuario(db, usuario_id)
 
-@router.get("/")
+@router.get("/", response_model=list[UsuarioResponse])
 def listar_usuarios(
     db: Session = Depends(get_db),
     usuario = Depends(require_role(PerfilUsuario.GERENTE)),

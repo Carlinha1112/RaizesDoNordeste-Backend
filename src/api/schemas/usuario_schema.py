@@ -32,6 +32,7 @@ class UsuarioResponse(BaseModel):
     email: str
     telefone: str
     perfil: PerfilUsuario
+    id_unidade: int | None = None
     ativo: bool
 
     class Config:

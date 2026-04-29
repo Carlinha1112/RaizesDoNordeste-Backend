@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from src.domain.entities.pedido import Pedido
 from src.domain.enums.pedido_status import StatusPreparo
+from src.domain.enums.pedido_status import StatusPedido
 from src.infrastructure.repositories.pedido_repository import PedidoRepository
 
 class CozinhaService:
@@ -13,7 +14,7 @@ class CozinhaService:
         pedido = self.pedido_repository.buscar_por_id(db, pedido_id)
         if not pedido:
             raise Exception("Pedido não encontrado")
-        if pedido.status_pagamento != StatusPagamento.PAGO:
+        if pedido.status_pedido != StatusPedido.PAGO:
             raise Exception("Pedido ainda não foi pago")
         pedido.status_preparo = StatusPreparo.EM_PREPARO
         db.commit()
