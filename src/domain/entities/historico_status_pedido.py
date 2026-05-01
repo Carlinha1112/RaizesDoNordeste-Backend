@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, Enum, DateTime
+from sqlalchemy import Column, Integer, ForeignKey, Enum, DateTime, String
 from sqlalchemy.orm import relationship
 from src.infrastructure.database.database import Base
 from datetime import datetime, timezone
@@ -17,7 +17,8 @@ class HistoricoStatusPedido(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_pedido = Column(Integer, ForeignKey("pedido.id"), nullable=False)
-    status = Column(Enum(StatusPedido), nullable=False)
+    status_anterior = Column(String)
+    status_novo = Column(String)
     data_hora = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     pedido = relationship("Pedido")

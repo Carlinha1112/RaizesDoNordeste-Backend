@@ -2652,6 +2652,22 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Credenciais invalidas",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Pedido com estoque insuficiente",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
         }
       ]
     }

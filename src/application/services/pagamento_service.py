@@ -27,9 +27,6 @@ class PagamentoService:
         self.estoque_repository = estoque_repository
         self.fidelidade_service = fidelidade_service
 
-    # =====================================================
-    # PROCESSAR PAGAMENTO
-    # =====================================================
     def processar_pagamento(
         self,
         db: Session,
@@ -49,9 +46,6 @@ class PagamentoService:
                 detail="Pedido não encontrado"
             )
 
-        # ==========================================
-        # SEGURANÇA
-        # ==========================================
         if usuario.perfil == PerfilUsuario.CLIENTE:
             if pedido.id_usuario != usuario.id:
                 raise HTTPException(
@@ -66,9 +60,6 @@ class PagamentoService:
                     detail="Você não pode pagar pedidos de outra unidade"
                 )
 
-        # ==========================================
-        # VALIDA STATUS
-        # ==========================================
         if not PedidoDomain.pode_ser_pago(
             pedido.status_pedido
         ):
@@ -77,12 +68,6 @@ class PagamentoService:
                 detail="Pedido não pode ser pago"
             )
 
-        # ==========================================
-        # REGRAS DE APROVAÇÃO
-        # ==========================================
-        # PIX sempre aprova
-        # Dinheiro sempre aprova
-        # Cartão pode negar aleatoriamente
         if metodo == Metodo.PIX:
             aprovado = True
 
@@ -97,9 +82,6 @@ class PagamentoService:
         else:
             aprovado = False
 
-        # ==========================================
-        # CRIA REGISTRO PAGAMENTO
-        # ==========================================
         pagamento = Pagamento(
             id_pedido=pedido.id,
             metodo=metodo,
@@ -118,16 +100,12 @@ class PagamentoService:
                 pagamento
             )
 
-            # ==================================
-            # SE APROVADO
-            # ==================================
             if aprovado:
 
                 PedidoDomain.marcar_como_pago(
                     pedido
                 )
 
-                # só gera fidelidade se existir cliente
                 if pedido.id_usuario:
 
                     self.fidelidade_service.adicionar_pontos(

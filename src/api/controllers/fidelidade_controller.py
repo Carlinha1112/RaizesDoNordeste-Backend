@@ -45,3 +45,13 @@ def consultar_pontos_usuario(
 ):
     pontos = service.consultar_pontos(db, usuario_id)
     return {"usuario_id": usuario_id, "pontos": pontos}
+
+@router.get("/simular")
+def simular_fidelidade(
+    pontos: int,
+    valor_pedido: float,
+    db: Session = Depends(get_db),
+    usuario=Depends(get_current_user),
+    service: FidelidadeService = Depends(get_fidelidade_service)
+):
+    return service.simular_desconto(valor_pedido, pontos)

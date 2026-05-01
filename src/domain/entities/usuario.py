@@ -19,14 +19,17 @@ class Usuario(Base):
     __tablename__ = "usuario"
 
     id = Column(Integer, primary_key=True, index=True)
+    id_unidade = Column(Integer, ForeignKey("unidade.id"), nullable=True)    
     nome = Column(String, nullable=False)
     data_nasc = Column(Date, nullable=False)
     email = Column(String, unique=True, nullable=False)
     telefone = Column(String, nullable=False)
     senha_hash = Column(String, nullable=False)
     perfil = Column(Enum(PerfilUsuario), nullable=False)
-    id_unidade = Column(Integer, ForeignKey("unidade.id"), nullable=True)
     data_cadastro = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    consentimento = Column(Boolean, default=False)
+    data_consentimento = Column(DateTime, nullable=True)
+    versao_termos = Column(String(10), nullable=True)
     ativo = Column(Boolean, default=True)
 
     unidade = relationship("Unidade")  

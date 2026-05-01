@@ -4,6 +4,12 @@ from decimal import Decimal
 
 from src.domain.entities.estoque import Estoque
 from src.domain.entities.usuario import PerfilUsuario
+from src.domain.entities.usuario import Usuario
+from src.domain.entities.movimento_estoque import (
+    MovimentoEstoque,
+    TipoMovimento,
+    MotivoMovimento
+)
 
 from src.infrastructure.repositories.estoque_repository import (
     EstoqueRepository
@@ -15,12 +21,17 @@ class EstoqueService:
     def __init__(self):
         self.repository = EstoqueRepository()
 
-    def criar_ou_repor(
-        self,
-        db: Session,
-        dados,
-        usuario
-    ):
+    def _validar_permissao(self, usuario):
+        if usuario.perfil not in [
+            PerfilUsuario.ATENDENTE,
+            PerfilUsuario.GERENTE
+        ]:
+            raise HTTPException(
+                status_code=403,
+                detail="Sem permissão"
+            )
+
+    def criar_ou_repor(self, db: Session, dados, usuario):
         try:
             self._validar_permissao(usuario)
 
@@ -52,23 +63,10 @@ class EstoqueService:
     def listar(self, db: Session):
         return self.repository.listar(db)
 
-    def listar_por_unidade(
-        self,
-        db: Session,
-        unidade_id: int
-    ):
-        return self.repository.listar_por_unidade(
-            db,
-            unidade_id
-        )
+    def listar_por_unidade(self, db: Session, unidade_id: int):
+        return self.repository.listar_por_unidade(db, unidade_id)
 
-    def entrada(
-        self,
-        db: Session,
-        estoque_id: int,
-        quantidade,
-        usuario
-    ):
+    def entrada(self, db: Session, estoque_id: int, quantidade, usuario):
         try:
             self._validar_permissao(usuario)
 
@@ -76,6 +74,17 @@ class EstoqueService:
 
             item.quantidade += quantidade
 
+            movimento = MovimentoEstoque(
+                id_estoque=item.id,
+                id_usuario=usuario.id,
+                id_unidade=item.id_unidade,
+                tipo=TipoMovimento.ENTRADA,
+                quantidade=float(quantidade),
+                motivo=MotivoMovimento.AJUSTE
+            )
+
+            db.add(movimento)
+
             db.commit()
             db.refresh(item)
 
@@ -85,25 +94,27 @@ class EstoqueService:
             db.rollback()
             raise
 
-    def saida(
-        self,
-        db: Session,
-        estoque_id: int,
-        quantidade,
-        usuario
-    ):
+    def saida(self, db: Session, estoque_id: int, quantidade, usuario):
         try:
             self._validar_permissao(usuario)
 
             item = self._buscar_item(db, estoque_id)
 
             if item.quantidade < quantidade:
-                raise HTTPException(
-                    400,
-                    "Estoque insuficiente"
-                )
+                raise HTTPException(400, "Estoque insuficiente")
 
             item.quantidade -= quantidade
+
+            movimento = MovimentoEstoque(
+                id_estoque=item.id,
+                id_usuario=usuario.id,
+                id_unidade=item.id_unidade,
+                tipo=TipoMovimento.SAIDA,
+                quantidade=float(quantidade),
+                motivo=MotivoMovimento.AJUSTE
+            )
+
+            db.add(movimento)
 
             db.commit()
             db.refresh(item)
@@ -114,13 +125,7 @@ class EstoqueService:
             db.rollback()
             raise
 
-    def ajustar(
-        self,
-        db: Session,
-        estoque_id: int,
-        quantidade,
-        usuario
-    ):
+    def ajustar(self, db: Session, estoque_id: int, quantidade, usuario):
         try:
             self._validar_permissao(usuario)
 
@@ -128,6 +133,17 @@ class EstoqueService:
 
             item.quantidade = quantidade
 
+            movimento = MovimentoEstoque(
+                id_estoque=item.id,
+                id_usuario=usuario.id,
+                id_unidade=item.id_unidade,
+                tipo=TipoMovimento.AJUSTE,
+                quantidade=float(quantidade),
+                motivo=MotivoMovimento.AJUSTE
+            )
+
+            db.add(movimento)
+
             db.commit()
             db.refresh(item)
 
@@ -137,18 +153,10 @@ class EstoqueService:
             db.rollback()
             raise
 
-    def excluir(
-        self,
-        db: Session,
-        estoque_id: int,
-        usuario
-    ):
+    def excluir(self, db: Session, estoque_id: int, usuario):
         try:
             if usuario.perfil != PerfilUsuario.GERENTE:
-                raise HTTPException(
-                    403,
-                    "Sem permissão"
-                )
+                raise HTTPException(403, "Sem permissão")
 
             item = self._buscar_item(db, estoque_id)
 
@@ -159,14 +167,18 @@ class EstoqueService:
             db.rollback()
             raise
 
+    def buscar_estoque(self, db, id_unidade, ingrediente_id):
+        return self.repository.buscar_por_unidade_ingrediente(
+            db,
+            id_unidade,
+            ingrediente_id
+        )
+
     def baixar_estoque_por_pedido(self, db, pedido):
-
         for item in pedido.itens:
-
             produto = item.produto
 
             for composicao in produto.ingredientes:
-
                 quantidade_total = (
                     Decimal(str(composicao.quantidade))
                     * Decimal(str(item.quantidade))
@@ -175,56 +187,51 @@ class EstoqueService:
                 self.debitar_por_pedido(
                     db,
                     pedido.id_unidade,
-                    composicao.ingrediente_id,   # ou nome correto do campo
+                    composicao.ingrediente_id,
                     quantidade_total
                 )
-    
-    def debitar_por_pedido( 
-        self, 
-        db: Session, 
-        unidade_id: int, 
-        ingrediente_id: int, 
-        quantidade
-    ): 
-        item = self.repository.buscar_por_unidade_ingrediente( 
-            db, 
-            unidade_id, 
-            ingrediente_id 
-        ) 
-        if not item: 
-            raise HTTPException( 
-                404, 
-                "Ingrediente sem estoque" 
-            ) 
-        quantidade = Decimal(str(quantidade))
-        if item.quantidade < quantidade: 
-            raise HTTPException( 
-                400, 
-                "Estoque insuficiente" 
-            ) 
-        item.quantidade -= quantidade 
-        db.flush() 
 
-    def _buscar_item(self, db, estoque_id):
-        item = self.repository.buscar_por_id(
+    def debitar_por_pedido(self, db: Session, unidade_id: int, ingrediente_id: int, quantidade):
+        item = self.repository.buscar_por_unidade_ingrediente(
             db,
-            estoque_id
+            unidade_id,
+            ingrediente_id
         )
 
         if not item:
-            raise HTTPException(
-                404,
-                "Item não encontrado"
-            )
+            raise HTTPException(404, "Ingrediente sem estoque")
+
+        quantidade = Decimal(str(quantidade))
+
+        if item.quantidade < quantidade:
+            raise HTTPException(400, "Estoque insuficiente")
+
+        item.quantidade -= quantidade
+
+        usuario_sistema = db.query(Usuario).filter(
+            Usuario.email == "sistema@interno.com"
+        ).first()
+
+        if not usuario_sistema:
+            raise HTTPException(500, "Usuário sistema não encontrado")  
+
+        movimento = MovimentoEstoque(
+            id_estoque=item.id,
+            id_usuario=usuario_sistema.id,
+            id_unidade=unidade_id,
+            tipo=TipoMovimento.SAIDA,
+            quantidade=float(quantidade),
+            motivo=MotivoMovimento.PEDIDO
+        )
+
+        db.add(movimento)
+
+        db.flush()
+
+    def _buscar_item(self, db, estoque_id):
+        item = self.repository.buscar_por_id(db, estoque_id)
+
+        if not item:
+            raise HTTPException(404, "Item não encontrado")
 
         return item
-
-    def _validar_permissao(self, usuario):
-        if usuario.perfil not in [
-            PerfilUsuario.GERENTE,
-            PerfilUsuario.ATENDENTE
-        ]:
-            raise HTTPException(
-                403,
-                "Sem permissão"
-            )

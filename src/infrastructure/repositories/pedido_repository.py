@@ -9,9 +9,6 @@ from src.domain.enums.pedido_status import (
 
 class PedidoRepository:
 
-    # =====================================================
-    # CREATE
-    # =====================================================
 
     def criar(
         self,
@@ -22,9 +19,6 @@ class PedidoRepository:
         db.flush()   # gera ID sem commit
         return pedido
 
-    # =====================================================
-    # READ
-    # =====================================================
 
     def buscar_por_id(
         self,
@@ -68,9 +62,6 @@ class PedidoRepository:
             Pedido.canal_pedido == canal
         ).all()
 
-    # =====================================================
-    # PREPARO
-    # =====================================================
 
     def listar_fila_preparo(
         self,
@@ -108,10 +99,7 @@ class PedidoRepository:
             Pedido.status_preparo == status
         ).all()
 
-    # =====================================================
-    # UPDATE
-    # =====================================================
-
+   
     def atualizar(
         self,
         db: Session,

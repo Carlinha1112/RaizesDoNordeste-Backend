@@ -10,7 +10,6 @@ engine = create_engine(
     connect_args={"check_same_thread": False}
 )
 
-# ATIVA FOREIGN KEYS NO SQLITE
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
     if isinstance(dbapi_connection, sqlite3.Connection):

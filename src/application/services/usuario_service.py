@@ -4,6 +4,7 @@ from src.domain.entities.usuario import Usuario
 from src.api.schemas.usuario_schema import UsuarioCreate
 from src.api.schemas.usuario_schema import PerfilUsuario
 from passlib.context import CryptContext
+from datetime import datetime
 from fastapi import HTTPException
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -14,21 +15,28 @@ class UsuarioService:
         self.repository = repository
 
 
-    def criar_usuario(self, db: Session, usuario: UsuarioCreate):
+    def criar_usuario(self, db: Session, dados: UsuarioCreate):
+        if not dados.consentimento:
+            raise HTTPException(
+                status_code=400, 
+                detail="É necessário aceitar os termos para criar uma conta")
 
-        if usuario.perfil == PerfilUsuario.ATENDENTE and not usuario.id_unidade:
+        if dados.perfil == PerfilUsuario.ATENDENTE and not dados.id_unidade:
             raise HTTPException(status_code=400, detail="Atendente deve estar vinculado a uma unidade")
 
         usuario_entity = Usuario(
-            nome=usuario.nome,
-            data_nasc=usuario.data_nasc,
-            email=usuario.email,
-            telefone=usuario.telefone,
-            perfil=usuario.perfil,
-            id_unidade=usuario.id_unidade
+            nome=dados.nome,
+            data_nasc=dados.data_nasc,
+            email=dados.email,
+            telefone=dados.telefone,
+            perfil=dados.perfil,
+            id_unidade=dados.id_unidade,
+            consentimento=True,
+            data_consentimento=datetime.utcnow(),
+            versao_termos="1.0"    
         )
 
-        usuario_entity.senha_hash = usuario_entity.hash_password(usuario.senha)
+        usuario_entity.senha_hash = usuario_entity.hash_password(dados.senha)
 
         usuario_salvo = self.repository.criar(db, usuario_entity)
 

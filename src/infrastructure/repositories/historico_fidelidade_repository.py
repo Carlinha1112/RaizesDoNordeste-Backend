@@ -16,11 +16,13 @@ class HistoricoFidelidadeRepository:
         usuario_id: int,
         pontos: int,
         tipo: TipoMovimento,
-        origem: Origem
+        origem: Origem,
+        pedido_id: int | None = None
     ):
         historico = HistoricoFidelidade(
             id_fidelidade=fidelidade_id,
             id_usuario=usuario_id,
+            id_pedido=pedido_id,
             pontos=pontos,
             tipo_movimento=tipo,
             origem=origem

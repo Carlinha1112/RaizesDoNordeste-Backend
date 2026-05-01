@@ -25,8 +25,10 @@ class PedidoCreate(BaseModel):
     canal_pedido: CanalPedido
     cliente_id: Optional[int] = None
     itens: List[ItemPedidoCreate]
-    pontos_utilizados: int = 0
 
+class PedidoConfirmacao(BaseModel):
+    usar_fidelidade: bool = False
+    pontos_usados: int = 0
 
 class PedidoResponse(BaseModel):
     id: int
@@ -41,3 +43,4 @@ class PedidoResponse(BaseModel):
 
     class Config:
         from_attributes = True
+

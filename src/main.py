@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 
-from src.infrastructure.database.database import Base, engine
-from src.domain.entities import *   
+from src.infrastructure.database.database import Base, engine 
 
 from src.infrastructure.logging_config import setup_logging
 
@@ -17,6 +16,7 @@ from src.api.controllers import cozinha_controller
 from src.api.controllers import produto_controller
 from src.api.controllers import ingrediente_controller
 from src.api.controllers import estoque_controller
+from src.api.controllers import relatorio_controller
 
 from src.api.exceptions.exception_handler import (
     http_exception_handler,
@@ -56,20 +56,22 @@ def home():
     return {"message": "API Raízes do Nordeste funcionando"}
 
 
+app.include_router(auth_controller.router)
+
 app.include_router(usuario_controller.router)
 app.include_router(unidade_controller.router)
+
 app.include_router(produto_controller.router)
 app.include_router(cardapio_controller.router)
 app.include_router(cardapio_produto_controller.router)
+
 app.include_router(pedido_controller.router)
-app.include_router(pagamento_controller.router)
-
-app.include_router(fidelidade_controller.router)
 app.include_router(cozinha_controller.router)
-app.include_router(ingrediente_controller.router)
+
 app.include_router(estoque_controller.router)
+app.include_router(ingrediente_controller.router)
 
-app.include_router(auth_controller.router) 
+app.include_router(pagamento_controller.router)
+app.include_router(fidelidade_controller.router)
 
-app.add_exception_handler(HTTPException, http_exception_handler)
-app.add_exception_handler(Exception, generic_exception_handler)
+app.include_router(relatorio_controller.router)

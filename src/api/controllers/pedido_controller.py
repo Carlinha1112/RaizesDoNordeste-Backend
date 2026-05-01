@@ -15,8 +15,9 @@ from src.infrastructure.repositories.cardapio_repository import CardapioReposito
 from src.infrastructure.repositories.cardapio_produto_repository import CardapioProdutoRepository
 from src.infrastructure.repositories.fidelidade_repository import FidelidadeRepository
 from src.infrastructure.repositories.historico_fidelidade_repository import HistoricoFidelidadeRepository
+from src.infrastructure.repositories.historico_pedido_repository import HistoricoPedidoRepository
 
-from src.api.schemas.pedido_schema import PedidoCreate, PedidoResponse
+from src.api.schemas.pedido_schema import PedidoCreate, PedidoResponse, PedidoConfirmacao
 
 from src.api.dependencies.auth_dependency import get_current_user
 from src.api.dependencies.role_dependency import require_role
@@ -29,10 +30,6 @@ router = APIRouter(
     tags=["Pedidos"]
 )
 
-
-# =====================================================
-# DEPENDENCIES
-# =====================================================
 
 def get_fidelidade_service():
     return FidelidadeService(
@@ -49,13 +46,10 @@ def get_pedido_service():
         EstoqueService(),
         get_fidelidade_service(),
         CardapioRepository(),
-        CardapioProdutoRepository()
+        CardapioProdutoRepository(),
+        HistoricoPedidoRepository()
     )
 
-
-# =====================================================
-# CRIAR PEDIDO
-# =====================================================
 
 @router.post("/", response_model=PedidoResponse)
 def criar_pedido(
@@ -73,14 +67,42 @@ def criar_pedido(
         db=db,
         pedido_data=pedido,
         itens=pedido.itens,
-        pontos_utilizados=pedido.pontos_utilizados,
         usuario=usuario
     )
 
+@router.get("/{pedido_id}/resumo")
+def resumo_pedido(
+    pedido_id: int,
+    db: Session = Depends(get_db),
+    usuario=Depends(get_current_user),
+    service: PedidoService = Depends(get_pedido_service)
+):
+    return service.resumo_pedido_com_fidelidade(
+        db,
+        pedido_id,
+        usuario
+    )
 
-# =====================================================
-# BUSCAR PEDIDO
-# =====================================================
+@router.post("/{pedido_id}/confirmar", response_model=PedidoResponse)
+def confirmar_pedido(
+    pedido_id: int,
+    dados: PedidoConfirmacao,
+    db: Session = Depends(get_db),
+    usuario=Depends(
+        require_role(
+            PerfilUsuario.CLIENTE,
+            PerfilUsuario.ATENDENTE
+        )
+    ),
+    service: PedidoService = Depends(get_pedido_service)
+):
+    return service.confirmar_pedido(
+        db=db,
+        pedido_id=pedido_id,
+        usuario=usuario,
+        usar_fidelidade=dados.usar_fidelidade,
+        pontos=dados.pontos_usados
+    )
 
 @router.get("/{pedido_id}", response_model=PedidoResponse)
 def buscar_pedido(
@@ -96,10 +118,6 @@ def buscar_pedido(
     )
 
 
-# =====================================================
-# LISTAR PEDIDOS
-# =====================================================
-
 @router.get("/", response_model=list[PedidoResponse])
 def listar_pedidos(
     canal: CanalPedido | None = None,
@@ -113,10 +131,6 @@ def listar_pedidos(
         canal
     )
 
-
-# =====================================================
-# CANCELAR PEDIDO
-# =====================================================
 
 @router.delete("/{pedido_id}", response_model=PedidoResponse)
 def cancelar_pedido(
@@ -138,10 +152,6 @@ def cancelar_pedido(
     )
 
 
-# =====================================================
-# INICIAR PREPARO
-# =====================================================
-
 @router.patch("/{pedido_id}/iniciar-preparo", response_model=PedidoResponse)
 def iniciar_preparo(
     pedido_id: int,
@@ -159,10 +169,6 @@ def iniciar_preparo(
         pedido_id
     )
 
-
-# =====================================================
-# MARCAR PRONTO
-# =====================================================
 
 @router.patch("/{pedido_id}/pronto", response_model=PedidoResponse)
 def marcar_pronto(
@@ -182,10 +188,6 @@ def marcar_pronto(
     )
 
 
-# =====================================================
-# FINALIZAR PEDIDO
-# =====================================================
-
 @router.patch("/{pedido_id}/finalizar", response_model=PedidoResponse)
 def finalizar_pedido(
     pedido_id: int,
@@ -200,5 +202,6 @@ def finalizar_pedido(
 ):
     return service.finalizar_pedido(
         db,
-        pedido_id
+        pedido_id,
+        usuario
     )

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from src.domain.entities.fidelidade import Fidelidade
-
+from src.domain.entities.historico_fidelidade import HistoricoFidelidade
 
 class FidelidadeRepository:
 
@@ -25,3 +25,23 @@ class FidelidadeRepository:
 
     def listar(self, db: Session):
         return db.query(Fidelidade).all()
+    
+    def listar_historico(
+        self,
+        db: Session,
+        usuario_id=None,
+        data_inicio=None,
+        data_fim=None
+    ):
+        query = db.query(HistoricoFidelidade)
+
+        if usuario_id is not None:
+            query = query.filter(HistoricoFidelidade.usuario_id == usuario_id)
+
+        if data_inicio is not None:
+            query = query.filter(HistoricoFidelidade.data_hora >= data_inicio)
+
+        if data_fim is not None:
+            query = query.filter(HistoricoFidelidade.data_hora <= data_fim)
+
+        return query.all()
