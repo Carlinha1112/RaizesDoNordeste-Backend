@@ -6,6 +6,7 @@ from src.infrastructure.database.database import get_db
 from src.application.services.pedido_service import PedidoService
 from src.application.services.fidelidade_service import FidelidadeService
 from src.application.services.estoque_service import EstoqueService
+from src.application.services.auditoria_service import AuditoriaService
 
 from src.infrastructure.repositories.pedido_repository import PedidoRepository
 from src.infrastructure.repositories.item_pedido_repository import ItemPedidoRepository
@@ -16,11 +17,13 @@ from src.infrastructure.repositories.cardapio_produto_repository import Cardapio
 from src.infrastructure.repositories.fidelidade_repository import FidelidadeRepository
 from src.infrastructure.repositories.historico_fidelidade_repository import HistoricoFidelidadeRepository
 from src.infrastructure.repositories.historico_pedido_repository import HistoricoPedidoRepository
+from src.infrastructure.repositories.auditoria_repository import AuditoriaRepository
 
 from src.api.schemas.pedido_schema import PedidoCreate, PedidoResponse, PedidoConfirmacao
 
 from src.api.dependencies.auth_dependency import get_current_user
 from src.api.dependencies.role_dependency import require_role
+from src.api.dependencies.auditoria_dependency import get_auditoria_service
 
 from src.domain.entities.usuario import PerfilUsuario
 from src.domain.entities.pedido import CanalPedido
@@ -37,17 +40,19 @@ def get_fidelidade_service():
         HistoricoFidelidadeRepository()
     )
 
-
-def get_pedido_service():
+def get_pedido_service(
+    auditoria_service: AuditoriaService = Depends(get_auditoria_service)
+):
     return PedidoService(
         PedidoRepository(),
         ItemPedidoRepository(),
         ProdutoIngredienteRepository(),
-        EstoqueService(),
+        EstoqueService(auditoria_service),
         get_fidelidade_service(),
         CardapioRepository(),
         CardapioProdutoRepository(),
-        HistoricoPedidoRepository()
+        HistoricoPedidoRepository(),
+        auditoria_service
     )
 
 

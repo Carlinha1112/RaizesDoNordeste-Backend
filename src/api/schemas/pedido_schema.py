@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
 from typing import List, Optional
 
@@ -17,7 +17,7 @@ class CanalPedido(str, Enum):
 
 class ItemPedidoCreate(BaseModel):
     produto_id: int
-    quantidade: int
+    quantidade: int = Field(gt=0)
 
 
 class PedidoCreate(BaseModel):

@@ -199,6 +199,44 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Login credencial inválida",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "gerente1@email.com",
+                  "type": "text",
+                  "uuid": "7198002f-fe94-4ad1-a7e2-329a8f20c266"
+                },
+                {
+                  "key": "password",
+                  "value": "123457",
+                  "type": "text",
+                  "uuid": "5314d91c-a761-4ef7-a30f-b28fe7b40d0d"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8000/auth/login/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "auth",
+                "login",
+                ""
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -206,13 +244,42 @@
       "name": "Usuarios",
       "item": [
         {
+          "name": "Criar Usuario Sistema",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"Sistema\",\r\n    \"data_nasc\": \"1900-01-01\",\r\n    \"email\": \"sistema@interno.com\",\r\n    \"telefone\": \"41999999999\",\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"GERENTE\",\r\n    \"consentimento\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/usuarios/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "usuarios",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Criar Gerente",
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"nome\":\"Gerente1\",\r\n    \"data_nasc\": \"1985-05-01\",\r\n    \"email\": \"gerente1@email.com\",\r\n    \"telefone\": \"41988880000\",\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"GERENTE\"\r\n}",
+              "raw": "{\r\n    \"nome\":\"Gerente1\",\r\n    \"data_nasc\": \"1985-05-01\",\r\n    \"email\": \"gerente1@email.com\",\r\n    \"telefone\": \"41988880000\",\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"GERENTE\",\r\n    \"consentimento\": true\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -241,7 +308,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"nome\":\"Atendente1\",\r\n    \"data_nasc\": \"1990-04-15\",\r\n    \"email\": \"atendente1@email.com\",\r\n    \"telefone\": \"41988881111\",\r\n    \"id_unidade\": 1,\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"ATENDENTE\"\r\n}",
+              "raw": "{\r\n    \"nome\":\"Atendente1\",\r\n    \"data_nasc\": \"1990-04-15\",\r\n    \"email\": \"atendente1@email.com\",\r\n    \"telefone\": \"41988881111\",\r\n    \"id_unidade\": 1,\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"ATENDENTE\",\r\n    \"consentimento\": true\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -270,7 +337,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"nome\":\"Atendente2\",\r\n    \"data_nasc\": \"1995-06-08\",\r\n    \"email\": \"atendente2@email.com\",\r\n    \"telefone\": \"41988884444\",\r\n    \"id_unidade\": 2,\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"ATENDENTE\"\r\n}",
+              "raw": "{\r\n    \"nome\":\"Atendente2\",\r\n    \"data_nasc\": \"1995-06-08\",\r\n    \"email\": \"atendente2@email.com\",\r\n    \"telefone\": \"41988884444\",\r\n    \"id_unidade\": 2,\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"ATENDENTE\",\r\n    \"consentimento\": true\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -299,7 +366,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"nome\":\"Cliente1\",\r\n    \"data_nasc\": \"1991-11-13\",\r\n    \"email\": \"cliente1@email.com\",\r\n    \"telefone\": \"41988882222\",\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"CLIENTE\"\r\n}",
+              "raw": "{\r\n    \"nome\":\"Cliente1\",\r\n    \"data_nasc\": \"1991-11-13\",\r\n    \"email\": \"cliente1@email.com\",\r\n    \"telefone\": \"41988882222\",\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"CLIENTE\",\r\n    \"consentimento\": true\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -328,7 +395,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"nome\":\"Cliente2\",\r\n    \"data_nasc\": \"2001-10-02\",\r\n    \"email\": \"cliente2@email.com\",\r\n    \"telefone\": \"41988883333\",\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"CLIENTE\"\r\n}",
+              "raw": "{\r\n    \"nome\":\"Cliente2\",\r\n    \"data_nasc\": \"2001-10-02\",\r\n    \"email\": \"cliente2@email.com\",\r\n    \"telefone\": \"41988883333\",\r\n    \"senha\": \"123456\",\r\n    \"perfil\": \"CLIENTE\",\r\n    \"consentimento\": true\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -351,55 +418,56 @@
           "response": []
         },
         {
-          "name": "Desativar Atendente 1",
+          "name": "Listar Usuarios sem token",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3MzQ5MTMwfQ.zVMwGStabeueQccvPEvPyWkfnGVCm9-WZ4Z0AB_G9Fo",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"id_unidade\": 1,\r\n    \"canal_pedido\": \"BALCAO\",\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 2,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}"
-            },
-            "url": {
-              "raw": "http://localhost:8000/usuarios/2/desativar",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8000",
-              "path": [
-                "usuarios",
-                "2",
-                "desativar"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Listar Usuarios",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3MzUyOTI0fQ.KL-oE_XXQ8VxhdBQywYpCbXP_WXOweJpOkucjhYvjas",
+                  "value": "",
                   "type": "string"
                 }
               ]
             },
             "method": "GET",
             "header": [],
+            "url": {
+              "raw": "http://localhost:8000/usuarios",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Usuarios sem acesso",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZXhwIjoxNzc3ODQ2NjU3fQ.AK-qlyCf1VxtG0zV-NtVaDQ0zyt3JI7m-vVt4_ADl1o",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
             "url": {
               "raw": "http://localhost:8000/usuarios",
               "protocol": "http",
@@ -427,7 +495,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -466,7 +534,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -513,7 +581,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                       "type": "string"
                     }
                   ]
@@ -552,7 +620,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                       "type": "string"
                     }
                   ]
@@ -591,7 +659,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                       "type": "string"
                     }
                   ]
@@ -630,7 +698,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                       "type": "string"
                     }
                   ]
@@ -671,7 +739,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -710,7 +778,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -749,7 +817,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -788,7 +856,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -827,7 +895,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -866,7 +934,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -905,7 +973,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -944,7 +1012,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -974,42 +1042,95 @@
             }
           },
           "response": []
-        },
-        {
-          "name": "Listar Estoque",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3MzUyOTI0fQ.KL-oE_XXQ8VxhdBQywYpCbXP_WXOweJpOkucjhYvjas",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8000/estoque/",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8000",
-              "path": [
-                "estoque",
-                ""
-              ]
-            }
-          },
-          "response": []
         }
       ]
     },
     {
       "name": "Cardápio",
       "item": [
+        {
+          "name": "Produtos",
+          "item": [
+            {
+              "name": "Criar Suco de Cajú médio",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"nome\": \"Suco de Cajú médio\",\r\n  \"descricao\": \"Suco de cajú médio - 400ml\",\r\n  \"ingredientes\": [\r\n    {\r\n      \"ingrediente_id\": 1,\r\n      \"quantidade\": 400\r\n    }\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/produtos/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "produtos",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Criar Cuzcuz Nordestino",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"nome\": \"Cuscuz Nordestino\",\r\n  \"descricao\": \"Cuscuz com carne seca e queijo coalho\",\r\n  \"ingredientes\": [\r\n    {\r\n      \"ingrediente_id\": 2,\r\n      \"quantidade\": 200\r\n    },\r\n    {\r\n      \"ingrediente_id\": 3,\r\n      \"quantidade\": 100\r\n    },\r\n    {\r\n      \"ingrediente_id\": 4,\r\n      \"quantidade\": 50\r\n    }\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/produtos/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "produtos",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
         {
           "name": "Cardapio Produto",
           "item": [
@@ -1021,7 +1142,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                       "type": "string"
                     }
                   ]
@@ -1061,7 +1182,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                       "type": "string"
                     }
                   ]
@@ -1101,7 +1222,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                       "type": "string"
                     }
                   ]
@@ -1141,7 +1262,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                       "type": "string"
                     }
                   ]
@@ -1172,195 +1293,6 @@
                 }
               },
               "response": []
-            },
-            {
-              "name": "Listar Produtos do Cardapio 1",
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              },
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3MzQ2Mzk4fQ.H8WTnm43xYLSx2tAkifOu-BvqDbkbv-aelpKeJqetPQ",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"id_produto\": 2,\r\n  \"preco_venda\": 18.00\r\n}"
-                },
-                "url": {
-                  "raw": "http://localhost:8000/cardapios/1/produtos",
-                  "protocol": "http",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "cardapios",
-                    "1",
-                    "produtos"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Listar Produtos do Cardapio 2",
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              },
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3MzQ2Mzk4fQ.H8WTnm43xYLSx2tAkifOu-BvqDbkbv-aelpKeJqetPQ",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"id_produto\": 2,\r\n  \"preco_venda\": 18.00\r\n}"
-                },
-                "url": {
-                  "raw": "http://localhost:8000/cardapios/2/produtos",
-                  "protocol": "http",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "cardapios",
-                    "2",
-                    "produtos"
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
-        },
-        {
-          "name": "Produtos",
-          "item": [
-            {
-              "name": "Criar Suco de Cajú médio",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"nome\": \"Suco de Cajú médio\",\r\n  \"descricao\": \"Suco de cajú médio - 400ml\",\r\n  \"ingredientes\": [\r\n    {\r\n      \"ingrediente_id\": 1,\r\n      \"quantidade\": 400\r\n    }\r\n  ]\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "http://localhost:8000/produtos/",
-                  "protocol": "http",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "produtos",
-                    ""
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Criar Cuzcuz Nordestino",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"nome\": \"Cuscuz Nordestino\",\r\n  \"descricao\": \"Cuscuz com carne seca e queijo coalho\",\r\n  \"ingredientes\": [\r\n    {\r\n      \"ingrediente_id\": 2,\r\n      \"quantidade\": 200\r\n    },\r\n    {\r\n      \"ingrediente_id\": 3,\r\n      \"quantidade\": 100\r\n    },\r\n    {\r\n      \"ingrediente_id\": 4,\r\n      \"quantidade\": 50\r\n    }\r\n  ]\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "http://localhost:8000/produtos/",
-                  "protocol": "http",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "produtos",
-                    ""
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Listar Produtos",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3MzQ2Mzk4fQ.H8WTnm43xYLSx2tAkifOu-BvqDbkbv-aelpKeJqetPQ",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "http://localhost:8000/produtos/",
-                  "protocol": "http",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "produtos",
-                    ""
-                  ]
-                }
-              },
-              "response": []
             }
           ]
         },
@@ -1372,7 +1304,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -1411,7 +1343,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ3NDU5fQ.yiMU7MSwblijmhhDBQPVHOLA-1ujRUSYmyllX_EMV9s",
                   "type": "string"
                 }
               ]
@@ -1441,43 +1373,6 @@
             }
           },
           "response": []
-        },
-        {
-          "name": "Listar Cardapios",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3MzQ2Mzk4fQ.H8WTnm43xYLSx2tAkifOu-BvqDbkbv-aelpKeJqetPQ",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"id_unidade\": 2,\r\n  \"data_inicio\": \"2026-01-01\",\r\n  \"data_fim\": \"2026-06-30\"\r\n}"
-            },
-            "url": {
-              "raw": "http://localhost:8000/cardapios/",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8000",
-              "path": [
-                "cardapios",
-                ""
-              ]
-            }
-          },
-          "response": []
         }
       ]
     },
@@ -1485,14 +1380,14 @@
       "name": "Pedidos",
       "item": [
         {
-          "name": "Criar Pedido 1",
+          "name": "Criar Pedido 1 com sucesso",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZXhwIjoxNzc3NDIzMTA5fQ.fOO6f2oFK0FuTZLrpERQd0lyJNgwq5GIgDRiMAyt_Is",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZXhwIjoxNzc3ODQ3OTM4fQ.spMFiOaHZ1cLrcVacUAPdZY46-PQH7JzyyZsHpot1W8",
                   "type": "string"
                 }
               ]
@@ -1524,14 +1419,14 @@
           "response": []
         },
         {
-          "name": "Criar Pedido 2",
+          "name": "Criar Pedido 2 sem itens",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZXhwIjoxNzc3NDIyNTkxfQ.n3XIVasX1LThDxLqgsgx-MfyEYA53pqJsV8w4qc0Oz4",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZXhwIjoxNzc3ODQ4MjQxfQ.vfGWPHfCyZreVu5fnZmYwsPUBybI1XpteFb_YOHKSRM",
                   "type": "string"
                 }
               ]
@@ -1540,7 +1435,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"id_unidade\": 2,\r\n    \"canal_pedido\": \"APP\",\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 1,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n    \"id_unidade\": 2,\r\n    \"canal_pedido\": \"APP\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1563,14 +1458,14 @@
           "response": []
         },
         {
-          "name": "Criar Pedido 3",
+          "name": "Criar Pedido 2 estoque insuficiente",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZXhwIjoxNzc3NDIyNTkxfQ.n3XIVasX1LThDxLqgsgx-MfyEYA53pqJsV8w4qc0Oz4",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZXhwIjoxNzc3ODQ4MjQxfQ.vfGWPHfCyZreVu5fnZmYwsPUBybI1XpteFb_YOHKSRM",
                   "type": "string"
                 }
               ]
@@ -1579,7 +1474,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"id_unidade\": 1,\r\n    \"canal_pedido\": \"PICKUP\",\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 1,\r\n      \"quantidade\": 2\r\n    },\r\n    {\r\n      \"produto_id\": 2,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n    \"id_unidade\": 2,\r\n    \"canal_pedido\": \"APP\",\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 1,\r\n      \"quantidade\": 50\r\n    },\r\n    {\r\n      \"produto_id\": 2,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1602,14 +1497,14 @@
           "response": []
         },
         {
-          "name": "Criar Pedido 4",
+          "name": "Criar Pedido 2 com sucesso",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZXhwIjoxNzc3NDIyNjgzfQ.cxCZMqzPfcTkdlLAf_PtQHXfe3y1xUJTZ5hoHYMboWM",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZXhwIjoxNzc3ODQ4MjQxfQ.vfGWPHfCyZreVu5fnZmYwsPUBybI1XpteFb_YOHKSRM",
                   "type": "string"
                 }
               ]
@@ -1618,7 +1513,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"id_unidade\": 2,\r\n    \"canal_pedido\": \"APP\",\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 1,\r\n      \"quantidade\": 1\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n    \"id_unidade\": 2,\r\n    \"canal_pedido\": \"APP\",\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 1,\r\n      \"quantidade\": 3\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1641,14 +1536,14 @@
           "response": []
         },
         {
-          "name": "Criar Pedido 5",
+          "name": "Criar Pedido 3 login Atendente, pontos fidelidade Cliente",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZXhwIjoxNzc3NDIyNjgzfQ.cxCZMqzPfcTkdlLAf_PtQHXfe3y1xUJTZ5hoHYMboWM",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3ODQ4NDI5fQ.3x2W-_Bs5LvdCh139sAHosfzbgHiD9oU7QQt4SUjCSU",
                   "type": "string"
                 }
               ]
@@ -1680,14 +1575,14 @@
           "response": []
         },
         {
-          "name": "Criar Pedido 6",
+          "name": "Criar Pedido 4 quantidade negativa",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NDIyODQ4fQ.WfWh5NiZTESjMyxgTJGGI-oEIOQuWMhh7_HazH2TTf8",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3NzYzOTU3fQ.-cbGPIVvKFAxLn49hGNgm4afPTxRvpyr2SM6-2_29X8",
                   "type": "string"
                 }
               ]
@@ -1696,7 +1591,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"id_unidade\": 1,\r\n    \"canal_pedido\": \"BALCAO\",\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 2,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n    \"id_unidade\": 1,\r\n    \"canal_pedido\": \"BALCAO\",\r\n    \"cliente_id\": 5,\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 2,\r\n      \"quantidade\": -2\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1719,14 +1614,14 @@
           "response": []
         },
         {
-          "name": "Criar Pedido 7",
+          "name": "Criar Pedido 4 produto inexistente",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3NDIyOTMxfQ.hdvKBU--6v7nzraqXe4MXAN_UlNRs6YyQ9Db-X0vUFI",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3NzYzOTU3fQ.-cbGPIVvKFAxLn49hGNgm4afPTxRvpyr2SM6-2_29X8",
                   "type": "string"
                 }
               ]
@@ -1735,7 +1630,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"id_unidade\": 2,\r\n    \"canal_pedido\": \"BALCAO\",\r\n    \"cliente_id\": 4, \r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 1,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n    \"id_unidade\": 1,\r\n    \"canal_pedido\": \"BALCAO\",\r\n    \"cliente_id\": 5, \r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 7,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1758,14 +1653,14 @@
           "response": []
         },
         {
-          "name": "Criar Pedido 8",
+          "name": "Criar Pedido 4 com sucesso",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3NDIyOTMxfQ.hdvKBU--6v7nzraqXe4MXAN_UlNRs6YyQ9Db-X0vUFI",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3ODUwMjE5fQ.lcg-p5Ovhu7Gz4TIUjMTiKebzDnKIrY8-5eDEYvgUb8",
                   "type": "string"
                 }
               ]
@@ -1774,7 +1669,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"id_unidade\": 2,\r\n    \"canal_pedido\": \"BALCAO\",\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 2,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n    \"id_unidade\": 1,\r\n    \"canal_pedido\": \"BALCAO\",\r\n    \"cliente_id\": 5,\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 2,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1797,7 +1692,7 @@
           "response": []
         },
         {
-          "name": "Listar Pedidos",
+          "name": "Status Pedido 2 Aguardando Pagamento",
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -1807,7 +1702,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIzMDQ1fQ.mbAFX_ekocL1MwHfV0yqDFdH0OmrEunkiqX6HboCWXw",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NzU5ODM4fQ.brTNJe8wXv9Q1pIO_YrmUtfhsOKKzPJZvWwaPorb7JM",
                   "type": "string"
                 }
               ]
@@ -1819,7 +1714,7 @@
               "raw": ""
             },
             "url": {
-              "raw": "http://localhost:8000/pedidos/",
+              "raw": "http://localhost:8000/pedidos/2",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1827,7 +1722,7 @@
               "port": "8000",
               "path": [
                 "pedidos",
-                ""
+                "2"
               ]
             }
           },
@@ -1844,7 +1739,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3MjQ2NDM4fQ.Vr2zbqXlv3j9diGNYuUXOAcmtd1fKdFKBreHARC6APU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NzU4MTAzfQ.9f1SdvTxfwQDYsAVbcoODpoekAVfW68sGxtVjRL_HMk",
                   "type": "string"
                 }
               ]
@@ -1856,7 +1751,7 @@
               "raw": ""
             },
             "url": {
-              "raw": "http://localhost:8000/pedidos/3",
+              "raw": "http://localhost:8000/pedidos/4",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1864,7 +1759,38 @@
               "port": "8000",
               "path": [
                 "pedidos",
-                "3"
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Iniciar Preparo Pedido 1",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3ODQ4MTMzfQ.e_cu8pXR9iy4YONMLh5QGNYeMrTAWt5G03iZQklvL5E",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/pedidos/1/iniciar-preparo",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "pedidos",
+                "1",
+                "iniciar-preparo"
               ]
             }
           },
@@ -1878,7 +1804,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NDIzMzgwfQ.wUXk53vEMRDLUgoJ4sT8h14HzKoIBMv723cgBJ2kG1o",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3ODQ4NDI5fQ.3x2W-_Bs5LvdCh139sAHosfzbgHiD9oU7QQt4SUjCSU",
                   "type": "string"
                 }
               ]
@@ -1902,14 +1828,14 @@
           "response": []
         },
         {
-          "name": "Iniciar Preparo Pedido 4",
+          "name": "Marcar Pronto Pedido 1",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NDIzMzgwfQ.wUXk53vEMRDLUgoJ4sT8h14HzKoIBMv723cgBJ2kG1o",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3ODQ4MTMzfQ.e_cu8pXR9iy4YONMLh5QGNYeMrTAWt5G03iZQklvL5E",
                   "type": "string"
                 }
               ]
@@ -1917,7 +1843,7 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/pedidos/3/iniciar-preparo",
+              "raw": "http://localhost:8000/pedidos/1/pronto",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1925,8 +1851,8 @@
               "port": "8000",
               "path": [
                 "pedidos",
-                "3",
-                "iniciar-preparo"
+                "1",
+                "pronto"
               ]
             }
           },
@@ -1940,7 +1866,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NDIzMzgwfQ.wUXk53vEMRDLUgoJ4sT8h14HzKoIBMv723cgBJ2kG1o",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3ODQ4NDI5fQ.3x2W-_Bs5LvdCh139sAHosfzbgHiD9oU7QQt4SUjCSU",
                   "type": "string"
                 }
               ]
@@ -1964,14 +1890,14 @@
           "response": []
         },
         {
-          "name": "Marcar Pronto Pedido 4",
+          "name": "Finalizar Pedido 1",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NDIzMzgwfQ.wUXk53vEMRDLUgoJ4sT8h14HzKoIBMv723cgBJ2kG1o",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3ODQ4MTMzfQ.e_cu8pXR9iy4YONMLh5QGNYeMrTAWt5G03iZQklvL5E",
                   "type": "string"
                 }
               ]
@@ -1979,7 +1905,7 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/pedidos/3/pronto",
+              "raw": "http://localhost:8000/pedidos/1/finalizar",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1987,8 +1913,8 @@
               "port": "8000",
               "path": [
                 "pedidos",
-                "3",
-                "pronto"
+                "1",
+                "finalizar"
               ]
             }
           },
@@ -2002,38 +1928,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NDIzMzgwfQ.wUXk53vEMRDLUgoJ4sT8h14HzKoIBMv723cgBJ2kG1o",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8000/pedidos/3/finalizar",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8000",
-              "path": [
-                "pedidos",
-                "3",
-                "finalizar"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Finalizar Pedido 4",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NDIzMzgwfQ.wUXk53vEMRDLUgoJ4sT8h14HzKoIBMv723cgBJ2kG1o",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3ODQ4NDI5fQ.3x2W-_Bs5LvdCh139sAHosfzbgHiD9oU7QQt4SUjCSU",
                   "type": "string"
                 }
               ]
@@ -2062,14 +1957,14 @@
       "name": "Pagamentos",
       "item": [
         {
-          "name": "Criar Pagamento Pedido 1 Pix",
+          "name": "Criar Pagamento Pedido 1 Pix Aprovado",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZXhwIjoxNzc3NDIzMTA5fQ.fOO6f2oFK0FuTZLrpERQd0lyJNgwq5GIgDRiMAyt_Is",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3ODQ4MTMzfQ.e_cu8pXR9iy4YONMLh5QGNYeMrTAWt5G03iZQklvL5E",
                   "type": "string"
                 }
               ]
@@ -2102,14 +1997,14 @@
           "response": []
         },
         {
-          "name": "Criar Pagamento Pedido 2 Pix",
+          "name": "Criar Pagamento Pedido 2 Cartão Negado",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZXhwIjoxNzc3NDIzMTA5fQ.fOO6f2oFK0FuTZLrpERQd0lyJNgwq5GIgDRiMAyt_Is",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZXhwIjoxNzc3ODQ4MjQxfQ.vfGWPHfCyZreVu5fnZmYwsPUBybI1XpteFb_YOHKSRM",
                   "type": "string"
                 }
               ]
@@ -2121,7 +2016,7 @@
               "raw": ""
             },
             "url": {
-              "raw": "http://localhost:8000/pagamentos/2?metodo=PIX",
+              "raw": "http://localhost:8000/pagamentos/2?metodo=CARTAO",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -2134,7 +2029,7 @@
               "query": [
                 {
                   "key": "metodo",
-                  "value": "PIX"
+                  "value": "CARTAO"
                 }
               ]
             }
@@ -2149,7 +2044,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZXhwIjoxNzc3NDIzMTA5fQ.fOO6f2oFK0FuTZLrpERQd0lyJNgwq5GIgDRiMAyt_Is",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3ODQ4NDI5fQ.3x2W-_Bs5LvdCh139sAHosfzbgHiD9oU7QQt4SUjCSU",
                   "type": "string"
                 }
               ]
@@ -2178,14 +2073,14 @@
           "response": []
         },
         {
-          "name": "Criar Pagamento Pedido 4 Pix",
+          "name": "Criar Pagamento Pedido 4 Cartão",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZXhwIjoxNzc3NDIzMTk3fQ.iIjOr7uubx-RRNznka2xGd9DcWklAU5NyFoMGIhdqpY",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZXhwIjoxNzc3NTkzNDk2fQ.BFwp77OtJczySrhzgoU3ZLkRNtMV25ELygOhiD39CUc",
                   "type": "string"
                 }
               ]
@@ -2225,7 +2120,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NDIzMzgwfQ.wUXk53vEMRDLUgoJ4sT8h14HzKoIBMv723cgBJ2kG1o",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZXhwIjoxNzc3NTkzNDk2fQ.BFwp77OtJczySrhzgoU3ZLkRNtMV25ELygOhiD39CUc",
                   "type": "string"
                 }
               ]
@@ -2261,7 +2156,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NDIzMzgwfQ.wUXk53vEMRDLUgoJ4sT8h14HzKoIBMv723cgBJ2kG1o",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3NTkzNTYyfQ.XY0oVoHeX3HS6Hm0m5TGnlqViF5olmbBj52fTcXuVng",
                   "type": "string"
                 }
               ]
@@ -2297,7 +2192,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3NDIzNDUwfQ.OAwzTmYbXnobYZsJkqpLnIWOoJmO3tKUbvzvnvabBcI",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZXhwIjoxNzc3NzU3NDU1fQ.WDU3-I0RMkn_n59RZ0C31JC3UNDHFO7V9nb9Mmkj73M",
                   "type": "string"
                 }
               ]
@@ -2305,7 +2200,7 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/pagamentos/7?metodo=PIX",
+              "raw": "http://localhost:8000/pagamentos/4?metodo=PIX",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -2313,7 +2208,7 @@
               "port": "8000",
               "path": [
                 "pagamentos",
-                "7"
+                "4"
               ],
               "query": [
                 {
@@ -2333,7 +2228,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3NDIzNDUwfQ.OAwzTmYbXnobYZsJkqpLnIWOoJmO3tKUbvzvnvabBcI",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZXhwIjoxNzc3NTkzNTk2fQ.d1TtS8BiVSVnVYujdS_Bygfg9F-2CZhhRm07HktglBY",
                   "type": "string"
                 }
               ]
@@ -2367,141 +2262,14 @@
       "name": "Fidelidade",
       "item": [
         {
-          "name": "Buscar Fidelidade Gerente (Usuário 1)",
+          "name": "Buscar Fidelidade Cliente 1 (Usuário 5)",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIzMDQ1fQ.mbAFX_ekocL1MwHfV0yqDFdH0OmrEunkiqX6HboCWXw",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8000/fidelidade/1",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8000",
-              "path": [
-                "fidelidade",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Buscar Fidelidade Atendente 1 (Usuário 2)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIzMDQ1fQ.mbAFX_ekocL1MwHfV0yqDFdH0OmrEunkiqX6HboCWXw",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8000/fidelidade/2",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8000",
-              "path": [
-                "fidelidade",
-                "2"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Buscar Fidelidade Atendente 2 (Usuário 3)",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIzMDQ1fQ.mbAFX_ekocL1MwHfV0yqDFdH0OmrEunkiqX6HboCWXw",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": {
-              "raw": "http://localhost:8000/fidelidade/3",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8000",
-              "path": [
-                "fidelidade",
-                "3"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Buscar Fidelidade Cliente 1 (Usuário 4)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIzMDQ1fQ.mbAFX_ekocL1MwHfV0yqDFdH0OmrEunkiqX6HboCWXw",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8000/fidelidade/4",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8000",
-              "path": [
-                "fidelidade",
-                "4"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Buscar Fidelidade Cliente 2 (Usuário 5)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIzMDQ1fQ.mbAFX_ekocL1MwHfV0yqDFdH0OmrEunkiqX6HboCWXw",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NzU5ODM4fQ.brTNJe8wXv9Q1pIO_YrmUtfhsOKKzPJZvWwaPorb7JM",
                   "type": "string"
                 }
               ]
@@ -2522,38 +2290,63 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Buscar Fidelidade Cliente 2 (Usuário 6)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NzU5ODM4fQ.brTNJe8wXv9Q1pIO_YrmUtfhsOKKzPJZvWwaPorb7JM",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/fidelidade/6",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "fidelidade",
+                "6"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
     {
-      "name": "Erros",
+      "name": "Relatorios",
       "item": [
         {
-          "name": "Requisição sem token",
-          "request": {
-            "method": "GET",
-            "header": []
+          "name": "Relatorio estoque",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
           },
-          "response": []
-        },
-        {
-          "name": "Cliente tentando criar unidade",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc3NDIxOTExfQ.fML_HNwcDh1qFJrEd5c_IzBw2a3viAHlN04b-QS-mXU",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NzY0MDAzfQ.7JIew5KhAFmJZE2x-Ez_mb3fRE4grnTrQGv67I5Z5_8",
                   "type": "string"
                 }
               ]
             },
-            "method": "POST",
+            "method": "GET",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nome\": \"Curitiba - Cabral\",\r\n  \"cidade\": \"Curitiba\",\r\n  \"estado\": \"PR\"\r\n}",
+              "raw": "",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2561,38 +2354,41 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/unidades/",
+              "raw": "http://localhost:8000/relatorios/estoque",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
               "port": "8000",
               "path": [
-                "unidades",
-                ""
+                "relatorios",
+                "estoque"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Pedido com produto inexistente",
+          "name": "Relatorio fidelidade por usuario",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3NDIyOTMxfQ.hdvKBU--6v7nzraqXe4MXAN_UlNRs6YyQ9Db-X0vUFI",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NzU5ODM4fQ.brTNJe8wXv9Q1pIO_YrmUtfhsOKKzPJZvWwaPorb7JM",
                   "type": "string"
                 }
               ]
             },
-            "method": "POST",
+            "method": "GET",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"id_unidade\": 2,\r\n    \"canal_pedido\": \"BALCAO\",\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 2,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
+              "raw": "",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2600,38 +2396,42 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/pedidos/",
+              "raw": "http://localhost:8000/relatorios/fidelidade/5",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
               "port": "8000",
               "path": [
-                "pedidos",
-                ""
+                "relatorios",
+                "fidelidade",
+                "5"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Pedido sem campo",
+          "name": "Relatorio status pedido",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNzc3NDIyOTMxfQ.hdvKBU--6v7nzraqXe4MXAN_UlNRs6YyQ9Db-X0vUFI",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3NTk0MzUwfQ.XCDTxHn2Vwk76vFU9XGarhLFHgCGd098mu5asoytq2A",
                   "type": "string"
                 }
               ]
             },
-            "method": "POST",
+            "method": "GET",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"id_unidade\": 2,\r\n    \"canal_pedido\": \"BALCAO\",\r\n    \"itens\": [\r\n    {\r\n      \"produto_id\": 2,\r\n      \"quantidade\": 2\r\n    }\r\n  ]\r\n}",
+              "raw": "",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2639,33 +2439,54 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/pedidos/",
+              "raw": "http://localhost:8000/relatorios/pedidos",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
               "port": "8000",
               "path": [
-                "pedidos",
-                ""
+                "relatorios",
+                "pedidos"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Credenciais invalidas",
-          "request": {
-            "method": "GET",
-            "header": []
+          "name": "Auditoria",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
           },
-          "response": []
-        },
-        {
-          "name": "Pedido com estoque insuficiente",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzc3ODQ4NTIxfQ.i_GVtzyv6TSRl4uP9QIElv6QD_8xeYCt1MuXjCTLf1o",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
-            "header": []
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:8000/auditoria/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "auditoria",
+                ""
+              ]
+            }
           },
           "response": []
         }

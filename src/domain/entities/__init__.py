@@ -13,3 +13,4 @@ from src.domain.entities.historico_status_pedido import HistoricoStatusPedido
 from src.domain.entities.pagamento import Pagamento
 from src.domain.entities.fidelidade import Fidelidade
 from src.domain.entities.historico_fidelidade import HistoricoFidelidade
+from src.domain.entities.auditoria import Auditoria

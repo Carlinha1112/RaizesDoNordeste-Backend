@@ -27,7 +27,8 @@ class PedidoService:
         fidelidade_service,
         cardapio_repository,
         cardapio_produto_repository,
-        historico_pedido_repository
+        historico_pedido_repository,
+        auditoria_service
     ):
         self.pedido_repository = pedido_repository
         self.item_repository = item_pedido_repository
@@ -37,6 +38,7 @@ class PedidoService:
         self.cardapio_repository = cardapio_repository
         self.cardapio_produto_repository = cardapio_produto_repository
         self.historico_repository = historico_pedido_repository
+        self.auditoria_service = auditoria_service
 
     def criar_pedido(self, db, pedido_data, itens, usuario):
 
@@ -57,6 +59,12 @@ class PedidoService:
 
         for item in itens:
 
+            if item.quantidade <= 0:
+                raise HTTPException(
+                status_code=400,
+                detail=f"Quantidade inválida para o produto {item.produto_id}"
+                )
+            
             cardapio_produto = self.cardapio_produto_repository.buscar(
                 db,
                 cardapio.id,
@@ -155,6 +163,16 @@ class PedidoService:
                 )
 
                 self.item_repository.criar(db, item_pedido)
+            
+            db.flush()
+
+            self.auditoria_service.registrar(
+                db=db,
+                usuario_id=usuario.id,
+                acao="CRIAR_PEDIDO",
+                entidade="Pedido",
+                entidade_id=pedido.id
+            )    
 
             db.commit()
             db.refresh(pedido)
@@ -384,6 +402,13 @@ class PedidoService:
 
         pedido.status_preparo = "FINALIZADO"
 
+        self.auditoria_service.registrar(
+            db=db,
+            usuario_id=usuario.id,
+            acao="FINALIZAR_PEDIDO",
+            entidade="Pedido",
+            entidade_id=pedido.id
+        )
         historico = HistoricoStatusPedido(
             id_pedido=pedido.id,
             status_anterior="PRONTO",

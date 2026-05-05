@@ -17,11 +17,13 @@ from src.api.controllers import produto_controller
 from src.api.controllers import ingrediente_controller
 from src.api.controllers import estoque_controller
 from src.api.controllers import relatorio_controller
+from src.api.controllers import auditoria_controller
 
 from src.api.exceptions.exception_handler import (
     http_exception_handler,
     generic_exception_handler
 )
+
 
 setup_logging()
 
@@ -75,3 +77,4 @@ app.include_router(pagamento_controller.router)
 app.include_router(fidelidade_controller.router)
 
 app.include_router(relatorio_controller.router)
+app.include_router(auditoria_controller.router)

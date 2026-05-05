@@ -10,6 +10,6 @@ class Fidelidade(Base):
     id = Column(Integer, primary_key=True, index=True)
     id_usuario = Column(Integer, ForeignKey("usuario.id"), nullable=False)
     saldo_pontos = Column(Numeric(10, 2), default=0)    
-    usuario = relationship("Usuario")
-    data_cadastro = Column(DateTime, default=lambda: datetime.now(timezone.utc)
-)
+    data_cadastro = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+usuario = relationship("Usuario")    

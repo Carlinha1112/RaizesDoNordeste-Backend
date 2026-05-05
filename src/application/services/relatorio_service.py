@@ -82,17 +82,24 @@ class RelatorioService:
             for h in historicos
         ]
 
-    def relatorio_fidelidade_usuario(
-        self,
-        db,
-        usuario_logado,
-        usuario_id: int
-    ):
+    def relatorio_fidelidade_usuario(self, db: Session, usuario_logado, usuario_id: int):
+
         if (
             usuario_logado.id != usuario_id
             and usuario_logado.perfil != PerfilUsuario.GERENTE
         ):
             raise HTTPException(403, "Sem permissão")
+
+        fidelidade = self.fidelidade_repository.buscar_por_usuario(
+            db,
+            usuario_id
+        )
+
+        if not fidelidade:
+            raise HTTPException(
+                status_code=404,
+                detail="Usuário não possui registro de fidelidade"
+            )
 
         historicos = self.historico_fidelidade_repository.listar_por_usuario(
             db=db,
@@ -123,11 +130,6 @@ class RelatorioService:
                 "debito": debito,
                 "saldo": saldo
             })
-
-        fidelidade = self.fidelidade_repository.buscar_por_usuario(
-            db,
-            usuario_id
-        )
 
         return {
             "usuario_id": usuario_id,

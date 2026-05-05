@@ -75,9 +75,7 @@ class PagamentoService:
             aprovado = True
 
         elif metodo == Metodo.CARTAO:
-            aprovado = random.choice(
-                [True, True, True, False]
-            )
+            aprovado = False
 
         else:
             aprovado = False
@@ -111,9 +109,8 @@ class PagamentoService:
                     self.fidelidade_service.adicionar_pontos(
                         db=db,
                         usuario_id=pedido.id_usuario,
-                        valor_pedido=float(
-                            pedido.valor_total
-                        )
+                        valor_pedido=pedido.valor_total,  
+                        pedido_id=pedido.id               
                     )
 
             db.commit()

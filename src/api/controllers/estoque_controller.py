@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from src.infrastructure.database.database import get_db
 
+from src.api.dependencies.auditoria_dependency import get_auditoria_service
+
 from src.api.dependencies.auth_dependency import (
     get_current_user
 )
@@ -16,21 +18,24 @@ from src.api.schemas.estoque_schema import (
 
 from src.application.services.estoque_service import EstoqueService
 
+def get_estoque_service(
+    auditoria_service = Depends(get_auditoria_service)
+):
+    return EstoqueService(auditoria_service)
+
 router = APIRouter(
     prefix="/estoque",
     tags=["Estoque"]
 )
 
-service = EstoqueService()
-
-
 @router.post("/", response_model=EstoqueResponse)
 def criar(
     dados: EstoqueCreate,
     db: Session = Depends(get_db),
-    usuario=Depends(get_current_user)
+    usuario=Depends(get_current_user),
+    service: EstoqueService = Depends(get_estoque_service)
 ):
-    return service.criar_ou_repor(
+    return service.criar(
         db,
         dados,
         usuario
@@ -40,7 +45,8 @@ def criar(
 @router.get("/", response_model=list[EstoqueResponse])
 def listar(
     db: Session = Depends(get_db),
-    usuario=Depends(get_current_user)
+    usuario=Depends(get_current_user),
+    service: EstoqueService = Depends(get_estoque_service)
 ):
     return service.listar(db)
 
@@ -52,7 +58,8 @@ def listar(
 def listar_unidade(
     unidade_id: int,
     db: Session = Depends(get_db),
-    usuario=Depends(get_current_user)
+    usuario=Depends(get_current_user),
+    service: EstoqueService = Depends(get_estoque_service)
 ):
     return service.listar_por_unidade(
         db,
@@ -65,7 +72,8 @@ def entrada(
     id: int,
     dados: EstoqueMovimento,
     db: Session = Depends(get_db),
-    usuario=Depends(get_current_user)
+    usuario=Depends(get_current_user),
+    service: EstoqueService = Depends(get_estoque_service)
 ):
     return service.entrada(
         db,
@@ -80,7 +88,8 @@ def saida(
     id: int,
     dados: EstoqueMovimento,
     db: Session = Depends(get_db),
-    usuario=Depends(get_current_user)
+    usuario=Depends(get_current_user),
+    service: EstoqueService = Depends(get_estoque_service)
 ):
     return service.saida(
         db,
@@ -95,7 +104,8 @@ def ajustar(
     id: int,
     dados: EstoqueAjuste,
     db: Session = Depends(get_db),
-    usuario=Depends(get_current_user)
+    usuario=Depends(get_current_user),
+    service: EstoqueService = Depends(get_estoque_service)
 ):
     return service.ajustar(
         db,
@@ -109,7 +119,8 @@ def ajustar(
 def excluir(
     id: int,
     db: Session = Depends(get_db),
-    usuario=Depends(get_current_user)
+    usuario=Depends(get_current_user),
+    service: EstoqueService = Depends(get_estoque_service)
 ):
     service.excluir(
         db,

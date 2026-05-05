@@ -18,8 +18,9 @@ from src.infrastructure.repositories.estoque_repository import (
 
 class EstoqueService:
 
-    def __init__(self):
+    def __init__(self, auditoria_service):
         self.repository = EstoqueRepository()
+        self.auditoria_service = auditoria_service        
 
     def _validar_permissao(self, usuario):
         if usuario.perfil not in [
@@ -31,25 +32,37 @@ class EstoqueService:
                 detail="Sem permissão"
             )
 
-    def criar_ou_repor(self, db: Session, dados, usuario):
+    def criar(self, db: Session, dados, usuario):
         try:
             self._validar_permissao(usuario)
 
-            item = self.repository.buscar_por_unidade_ingrediente(
+            item_existente = self.repository.buscar_por_unidade_ingrediente(
                 db,
                 dados.id_unidade,
                 dados.id_ingrediente
             )
 
-            if item:
-                item.quantidade += dados.quantidade
-            else:
-                item = Estoque(
-                    id_unidade=dados.id_unidade,
-                    id_ingrediente=dados.id_ingrediente,
-                    quantidade=dados.quantidade
-                )
-                self.repository.criar(db, item)
+            if item_existente:
+                raise HTTPException(400, "Item de estoque já existe")
+
+            item = Estoque(
+                id_unidade=dados.id_unidade,
+                id_ingrediente=dados.id_ingrediente,
+                quantidade=dados.quantidade
+            )
+
+            self.repository.criar(db, item)
+
+            db.flush()
+
+            self.auditoria_service.registrar(
+                db=db,
+                usuario_id=usuario.id,
+                acao="CRIAR_ESTOQUE",
+                entidade="Estoque",
+                entidade_id=item.id,
+                detalhes=f"Ingrediente {item.id_ingrediente} criado com {item.quantidade}"
+        )
 
             db.commit()
             db.refresh(item)
@@ -74,13 +87,22 @@ class EstoqueService:
 
             item.quantidade += quantidade
 
+            self.auditoria_service.registrar(
+                db=db,
+                usuario_id=usuario.id,
+                acao="ENTRADA_ESTOQUE",
+                entidade="Estoque",
+                entidade_id=item.id,
+                detalhes=f"+{quantidade} unidades"
+            )
+
             movimento = MovimentoEstoque(
                 id_estoque=item.id,
                 id_usuario=usuario.id,
                 id_unidade=item.id_unidade,
                 tipo=TipoMovimento.ENTRADA,
                 quantidade=float(quantidade),
-                motivo=MotivoMovimento.AJUSTE
+                motivo=MotivoMovimento.REPOSICAO    
             )
 
             db.add(movimento)
@@ -104,6 +126,15 @@ class EstoqueService:
                 raise HTTPException(400, "Estoque insuficiente")
 
             item.quantidade -= quantidade
+
+            self.auditoria_service.registrar(
+                db=db,
+                usuario_id=usuario.id,
+                acao="SAIDA_ESTOQUE",
+                entidade="Estoque",
+                entidade_id=item.id,
+                detalhes=f"-{quantidade} unidades"
+        )
 
             movimento = MovimentoEstoque(
                 id_estoque=item.id,
@@ -131,7 +162,17 @@ class EstoqueService:
 
             item = self._buscar_item(db, estoque_id)
 
+            quantidade_anterior = item.quantidade
             item.quantidade = quantidade
+
+            self.auditoria_service.registrar(
+                db=db,
+                usuario_id=usuario.id,
+                acao="AJUSTE_ESTOQUE",
+                entidade="Estoque",
+                entidade_id=item.id,
+                detalhes=f"{quantidade_anterior} -> {quantidade}"
+            )
 
             movimento = MovimentoEstoque(
                 id_estoque=item.id,
@@ -214,6 +255,15 @@ class EstoqueService:
 
         if not usuario_sistema:
             raise HTTPException(500, "Usuário sistema não encontrado")  
+
+        self.auditoria_service.registrar(
+            db=db,
+            usuario_id=usuario_sistema.id,
+            acao="SAIDA_ESTOQUE_PEDIDO",
+            entidade="Estoque",
+            entidade_id=item.id,
+            detalhes=f"-{quantidade} (pedido automático)"
+        )
 
         movimento = MovimentoEstoque(
             id_estoque=item.id,

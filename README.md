@@ -284,25 +284,98 @@
 
    ---
 
-   ## Testes (Postman / Insomnia)
+   ## Testes da API (Postman)
 
-   Arquivo disponível no repositório:
+   A API possui uma coleção completa de testes no Postman disponível no repositório:
 
    ```text
-   postman_collection.json
+   docs/RaizesDoNordeste_Postman_Collection.json
    ```
 
-   ### Ordem sugerida
+   ### Como executar os testes
 
-   1. Login
-   2. Criar usuário cliente
-   3. Criar unidade
-   4. Criar produto
-   5. Criar pedido
-   6. Processar pagamento
-   7. Consultar status
-   8. Testar erros (401, 403, 404, 409, 422)
+   1. Inicie a API
+  
+   ```bash
+   # Ativar ambiente
+   source venv/bin/activate   # Linux/Mac
+   .\venv\Scripts\activate    # Windows
 
+   # Rodar API
+   uvicorn src.main:app --reload
+   ```
+   2. Abra o Postman
+   3. Importe a coleção .json
+   4. Configure a variável de ambiente
+
+   base_url = http://localhost:8000
+   
+   5. Execute os testes na ordem abaixo
+
+   ### Setup A (Básico)
+
+   Criação de usuários e unidades
+   Ordem:
+   1. Criar usuário sistema
+   2. Criar usuário gerente
+   3. Login gerente
+   4. Criar unidade Curitiba Centro
+   5. Criar unidade Curitiba Cabral
+   6. Criar atendentes
+   7. Criar clientes
+   8. Login atendentes e clientes
+
+   ### Setup B (Completo)
+   Requer Setup A
+
+   Configuração de estoque e cardápio:
+   1. Ingredientes
+   2. Estoque por unidade
+   3. Produtos
+   4. Cardápio
+   5. CardápioProduto
+
+   ### Testes
+   Autenticação e Autorização
+   |ID	|Cenário	                                 |Resultado esperado |
+   |-----|-----------------------------------------|-------------------|
+   |T01	|Login válido	                           |200 + JWT          |
+   |T02	|Login inválido	                        |401                |
+   |T03	|Sem token	                              |401                |
+   |T04	|Sem permissão	                           |403                |
+   
+   Pedidos
+   |ID	|Cenário	                                 |Resultado esperado |
+   |-----|-----------------------------------------|-------------------|
+   |T05	|Pedido válido	                           |200 OK             |
+   |T06	|Pedido sem itens	                        |422                |
+   |T07	|Estoque insuficiente                     |409                |
+   |T08	|Quantidade inválida                      |422                |
+   |T09	|Produto inexistente                      |404                |
+   
+   Pagamentos
+   |ID	|Cenário	                                 |Resultado esperado |
+   |-----|-----------------------------------------|-------------------|
+   |T10	|Pagamento aprovado (PIX)	               |Pedido → PAGO      |
+   |T11	|Pagamento recusado	                     |Mantém pendente    |
+   
+   Fidelidade
+   |ID	|Cenário	                                 |Resultado esperado |
+   |-----|-----------------------------------------|-------------------|
+   |T12	|Relatório fidelidade por usuário         |200 OK             |
+   
+   Estoque
+   |ID	|Cenário	                                 |Resultado esperado |
+   |-----|-----------------------------------------|-------------------|
+   |T13	|Relatório de estoque	                  |200 OK             | 
+   
+   Auditoria (Logs)
+   |ID	|Cenário	                                 |Resultado esperado |
+   |-----|-----------------------------------------|-------------------|
+   |T14	|Listar auditoria	                        |200 OK             |
+   |T15	|Criação de pedido gera registro de log	|Registro criado    |
+   
+    
    ---
 
    ## Logs

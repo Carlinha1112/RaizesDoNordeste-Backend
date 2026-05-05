@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from src.domain.entities.movimento_estoque import MovimentoEstoque
+from src.domain.entities.movimento_estoque import TipoMovimento
 
 
 class MovimentoRepository:
@@ -18,7 +19,9 @@ class MovimentoRepository:
             query = query.filter(MovimentoEstoque.id_unidade == unidade_id)
 
         if tipo is not None:
-            query = query.filter(MovimentoEstoque.tipo == tipo)
+            query = query.filter(
+            MovimentoEstoque.tipo == TipoMovimento(tipo)
+            )
 
         if data_inicio is not None:
             query = query.filter(MovimentoEstoque.data_hora >= data_inicio)

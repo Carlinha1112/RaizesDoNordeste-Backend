@@ -7,6 +7,7 @@ from src.api.dependencies.auth_dependency import get_current_user
 
 from src.application.services.relatorio_service import RelatorioService
 
+
 # Repositories
 from src.infrastructure.repositories.movimento_repository import MovimentoRepository
 from src.infrastructure.repositories.historico_pedido_repository import HistoricoPedidoRepository

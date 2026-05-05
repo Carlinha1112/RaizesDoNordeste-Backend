@@ -8,7 +8,6 @@ from src.domain.enums.fidelidade_enum import (
 )
 
 
-
 class FidelidadeService:
 
     PONTOS_POR_REAL = Decimal("1")
@@ -19,14 +18,15 @@ class FidelidadeService:
         self.fidelidade_repository = fidelidade_repository
         self.historico_repository = historico_repository
 
-    def buscar_ou_criar(
-        self,
-        db: Session,
-        usuario_id: int
-    ):
+    def _to_decimal(self, valor):
+        """Garante conversão segura para Decimal"""
+        if isinstance(valor, Decimal):
+            return valor
+        return Decimal(str(valor))
+
+    def buscar_ou_criar(self, db: Session, usuario_id: int):
         fidelidade = self.fidelidade_repository.buscar_por_usuario(
-            db,
-            usuario_id
+            db, usuario_id
         )
 
         if fidelidade:
@@ -43,13 +43,12 @@ class FidelidadeService:
         self,
         db: Session,
         usuario_id: int,
-        valor_pedido: float,
+        valor_pedido,
         pedido_id: int | None = None
     ):
-        fidelidade = self.buscar_ou_criar(
-            db,
-            usuario_id
-        )
+        fidelidade = self.buscar_ou_criar(db, usuario_id)
+
+        valor_pedido = self._to_decimal(valor_pedido)
 
         pontos = int(valor_pedido * self.PONTOS_POR_REAL)
 
@@ -73,7 +72,7 @@ class FidelidadeService:
         if fidelidade.saldo_pontos < pontos:
             raise HTTPException(400, "Pontos insuficientes")
 
-        fidelidade.saldo_pontos -= pontos
+        fidelidade.saldo_pontos -= Decimal(pontos)
 
         self.historico_repository.registrar(
             db=db,
@@ -86,45 +85,36 @@ class FidelidadeService:
 
         return fidelidade
 
-    def consultar_pontos(
-        self,
-        db: Session,
-        usuario_id: int
-    ):
-        fidelidade = self.buscar_ou_criar(
-            db,
-            usuario_id
-        )
-
+    def consultar_pontos(self, db: Session, usuario_id: int):
+        fidelidade = self.buscar_ou_criar(db, usuario_id)
         return fidelidade.saldo_pontos
-    
-    def calcular_desconto(self, valor_pedido: float, pontos_disponiveis: int):
 
-        valor_pedido = Decimal(str(valor_pedido))
+    def calcular_desconto(self, valor_pedido, pontos_disponiveis: int):
+
+        valor_pedido = self._to_decimal(valor_pedido)
         pontos_disponiveis = Decimal(pontos_disponiveis)
 
         desconto_teorico = pontos_disponiveis * self.VALOR_POR_PONTO
-
         limite = valor_pedido * self.LIMITE_DESCONTO
 
         desconto_aplicado = min(desconto_teorico, limite)
 
         pontos_usados = int(desconto_aplicado / self.VALOR_POR_PONTO)
 
-        return float(desconto_aplicado), pontos_usados
-    
+        return desconto_aplicado, pontos_usados  # 🔥 NÃO usar float
+
     def aplicar_fidelidade_pedido(
         self,
         db: Session,
         usuario_id: int,
         pedido_id: int,
-        valor_pedido: float,
+        valor_pedido,
         pontos_solicitados: int
     ):
         fidelidade = self.buscar_ou_criar(db, usuario_id)
 
         if pontos_solicitados <= 0:
-            return 0, 0
+            return Decimal("0"), 0
 
         desconto, pontos_usados = self.calcular_desconto(
             valor_pedido,
@@ -148,4 +138,4 @@ class FidelidadeService:
                 pedido_id=pedido_id
             )
 
-        return desconto, pontos_usados  
+        return desconto, pontos_usados
