@@ -158,6 +158,8 @@
 
    ## Endpoints Principais
 
+   A lista abaixo apresenta os principais endpois da API. A documentação completa, com parâmetros, exemplos de request/response e códigos de status, pode ser consultada no Swagger (/docs).
+
    | Método | Rota                             | Descrição                             | Acesso                        |
    | ------ | ------------------------------   | ------------------------------------- | ----------------------------- |
    | POST   | `/auth/login`                    | Login e token JWT                     | Público                       |
@@ -181,6 +183,7 @@
    | PATCH  | `/cozinha/{pedido_id}/iniciar`   | Inicia preparo do pedido              | ATENDENTE / GERENTE           |
    | PATCH  | `/cozinha/{pedido_id}/pronto`    | Marca pedido como pronto              | ATENDENTE / GERENTE           |
    | PATCH  | `/cozinha/{pedido_id}/finalizar` | Finaliza o pedido / entrega concluída | ATENDENTE / GERENTE           |
+
    
    ### Filtro por canal de pedido
 
@@ -312,6 +315,10 @@
    
    5. Execute os testes na ordem abaixo
 
+   Para garantir a correta execução dos testes, foram definidos dois cenários de preparação do ambiente:
+      Setup A (Básico): deve ser executado inicialmente e é responsável pela criação dos usuários e das unidades do sistema. Esse setup é pré-requisito para tod os demais testes.
+      Setup B (Completo): deve ser executado após o Setup A e prepara o ambiente com ingredientes, estoque, produtos e cardápio. Esse setup é necessário para a execução do stestes relacionados a pedidos, pagamentos, estoque e fidelidade. 
+
    ### Setup A (Básico)
 
    Criação de usuários e unidades
@@ -401,6 +408,8 @@
    * Dados pessoais usados apenas para operação
    * Fidelidade exige consentimento
    * JWT com expiração configurável
+   
+   Essas medidas atender aos requisitos mínimos de segurança e privacidade exigidos pelo projeto, garantindo confidencialidade, integridade e rastreabilidade das operações.
 
    ---
 
