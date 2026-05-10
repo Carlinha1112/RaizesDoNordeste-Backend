@@ -51,7 +51,7 @@
    **Windows**
 
    ```bash
-   venv\Scripts\activate
+   .\venv\Scripts\activate
    ```
 
    **Linux / Mac**
@@ -292,7 +292,7 @@
    A API possui uma coleção completa de testes no Postman disponível no repositório:
 
    ```text
-   docs/RaizesDoNordeste_Postman_Collection.json
+   docs/Raizes do Nordeste API.postman_collection.json
    ```
 
    ### Como executar os testes
